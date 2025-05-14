@@ -9,5 +9,5 @@ List<DateTime> createCheckedDateList(DateTime startDate, DateTime currentTime) {
     return List.generate(60, (i) => startDate.add((Duration(days: i))));
 
   return List.generate(
-      daysAfterExam.clamp(0, 14), (i) => currentTime.add(Duration(days: -i)));
+      daysAfterExam.clamp(0, 21), (i) => currentTime.add(Duration(days: -i)));
 }

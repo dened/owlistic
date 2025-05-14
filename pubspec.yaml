@@ -7,6 +7,9 @@ environment:
   sdk: ^3.5.4
 
 dependencies:
+  # Annotation
+  json_annotation: ^4.9.0
+
   # Utility
   args: ^2.4.0
 
@@ -22,3 +25,7 @@ dev_dependencies:
 
   # Testing
   test: any
+
+  # Code generation
+  build_runner: ^2.4.15
+  json_serializable: ^6.9.5 

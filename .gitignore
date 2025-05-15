@@ -4,3 +4,6 @@
 
 # Codegen
 *.g.dart
+
+# Data
+data/

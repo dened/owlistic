@@ -10,9 +10,8 @@ The Telc Certificate Checker Service checks the status of Telc certificates usin
 - [x] Print results (HTTP 200/404)
 
 ### Iteration 2: Storing User Data (File Storage)
-- [ ] Accept user data (`nummer`, `birthDate`, `checkDate`)
-- [ ] Store user data in a `users.json` file
-- [ ] Implement reading user data from the file
+- [x] Store user data in a `data.json` file
+- [x] Implement reading user data from the file
 
 ### Iteration 3: Telegram Bot Integration
 - [ ] Set up Telegram bot

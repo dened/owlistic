@@ -1,4 +1,4 @@
-import 'package:telc_result_checker/date_utils.dart';
+import 'package:telc_result_checker/src/date_utils.dart';
 import 'package:test/test.dart';
 
 void main() {

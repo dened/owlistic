@@ -11,3 +11,9 @@ List<DateTime> createCheckedDateList(DateTime startDate, DateTime currentTime) {
   return List.generate(
       daysAfterExam.clamp(0, 21), (i) => currentTime.add(Duration(days: -i)));
 }
+
+
+
+extension DateTimeExtension on DateTime {
+  String toTeclFormat() => toIso8601String().split('T').first;
+}

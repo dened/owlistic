@@ -4,6 +4,8 @@ import 'dart:developer';
 import 'package:intl/intl.dart';
 import 'package:l/l.dart';
 import 'package:telc_result_checker/owlistic.dart';
+import 'package:telc_result_checker/src/database.dart';
+import 'package:telc_result_checker/src/lookup_service_handler.dart';
 import 'package:telc_result_checker/src/telegram_bot.dart';
 
 Future<void> main(List<String> args) async {
@@ -14,10 +16,14 @@ Future<void> main(List<String> args) async {
       final storage = FileStorage(arguments.file);
       await storage.refresh();
 
+      final db = Database.lazy();
+      await db.refresh();
+      l.i('Database is ready');
+
       final service = TelcCertificateLookupService(
         apiClient: TelcApiClient(),
         storage: storage,
-        bot: TelegramBot(token: arguments.token),
+        handler: TelegramNotificationHandler(TelegramBot(token: arguments.token), db),
       );
       await service.start();
     }, (error, stackTrace) {

@@ -1,21 +1,20 @@
 import 'package:l/l.dart';
 import 'package:telc_result_checker/src/date_utils.dart';
-import 'package:telc_result_checker/src/dto/cetrificate_entity.dart';
 import 'package:telc_result_checker/src/dto/search_info.dart';
+import 'package:telc_result_checker/src/lookup_service_handler.dart';
 import 'package:telc_result_checker/src/storage/storage.dart';
 import 'package:telc_result_checker/src/telc_api_client.dart';
-import 'package:telc_result_checker/src/telegram_bot.dart';
 
 final class TelcCertificateLookupService {
   TelcCertificateLookupService({
     required this.apiClient,
     required this.storage,
-    required this.bot,
+    required this.handler,
   });
 
   final TelcApiClient apiClient;
   final Storage storage;
-  final TelegramBot bot;
+  final LookupServiceHandler handler;
 
   Future<void> start() async {
     final usersSearchInfoMap = await storage.usersSearchInfoMap();
@@ -43,11 +42,11 @@ final class TelcCertificateLookupService {
             examId,
             attendeeId,
           );
-            await _notifyUser(chatId, 'Результат найден: ${_certInfo(certificate)}');
+          handler.certFound(chatId, certificate).ignore();
           l.d('Certificate data: $certificate');
         } on CertInfoNotFoundException {
           l.i('Certificate not found for ${searchInfo.nummer} on ${searchInfo.examDate.toTeclFormat()}');
-          await _notifyUser(chatId, 'Результатов не найдено за последние 15 дней для пользователя: ${searchInfo.nummer}');
+          handler.certNotFound(chatId, searchInfo).ignore();
         } on Object catch (error, stackTrace) {
           l.e('An error occurred while checking certificates: $error', stackTrace);
         }
@@ -56,21 +55,6 @@ final class TelcCertificateLookupService {
       if (i + batchSize < allSearchTasks.length) {
         await Future<void>.delayed(batchDelay);
       }
-    }
-  }
-
-String _certInfo(CertificateEntity cert) => cert.resultInfo.map((e) => '${e.title}: ${e.points}/${e.content}').join('\n');
-
-  Future<void> _notifyUser(String chatId, String message) async {
-    final id = int.tryParse(chatId) ?? 0;
-    if (id == 0) {
-      l.w('Invalid chat ID: $chatId');
-      return;
-    } 
-    try {
-      final messageId = await bot.sendMessage(id, message);
-    } on Object catch (error, stackTrace) {
-      l.e('Failed to send message to chat ID $chatId: $error', stackTrace);
     }
   }
 

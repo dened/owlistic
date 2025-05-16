@@ -1,0 +1,34 @@
+-- Key-Value table
+CREATE TABLE
+    IF NOT EXISTS kv_table (
+        -- req Key is the key of the key-value pair
+        k TEXT NOT NULL PRIMARY KEY,
+        -- string
+        vstring TEXT,
+        -- int
+        vint INTEGER,
+        -- float
+        vfloat REAL,
+        -- bool
+        vbool INTEGER,
+        --req Created date(unixtime in seconds)
+        meta_created_at INTEGER NOT NULL DEFAULT (strftime ('%s', 'now')),
+        --req Updated date(unixtime in seconds)
+        meta_updated_at INTEGER NOT NULL DEFAULT (strftime ('%s', 'now')) CHECK (meta_updated_at >= meta_created_at)
+    ) STRICT;
+
+-- Indexes
+CREATE INDEX IF NOT EXISTS kv_meta_created_at_idx ON kv_table (meta_created_at);
+
+CREATE INDEX IF NOT EXISTS kv_meta_updated_at_idx ON kv_table (meta_updated_at);
+
+-- Triggers
+CREATE TRIGGER IF NOT EXISTS kv_table_update_trigger AFTER
+UPDATE ON kv_table BEGIN
+UPDATE kv_table
+SET
+    meta_updated_at = strftime ('%s', 'now')
+WHERE
+    k = NEW.k;
+
+END;

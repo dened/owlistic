@@ -12,6 +12,7 @@ dependencies:
 
   # Utility
   args: ^2.6.0
+  path: ^1.9.1
   intl: ^0.20.2
 
   # Network
@@ -19,6 +20,10 @@ dependencies:
 
   # Logger
   l: ^5.0.0
+
+  # Database (SQLite)
+  drift: ^2.25.1
+
 
 dev_dependencies:
   # Linting
@@ -29,4 +34,5 @@ dev_dependencies:
 
   # Code generation
   build_runner: ^2.4.15
+  drift_dev: ^2.25.2
   json_serializable: ^6.9.5 

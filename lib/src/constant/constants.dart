@@ -56,3 +56,10 @@ const bool kProfileMode = bool.fromEnvironment('dart.vm.profile');
 ///  * [kReleaseMode], which is true in release builds.
 ///  * [kProfileMode], which is true in profile builds.
 const bool kDebugMode = !kReleaseMode && !kProfileMode;
+
+
+const String updateIdKey = 'last_update_id_key';
+
+
+// How many days back to check for the certificate
+const int daysForCheck = 21;

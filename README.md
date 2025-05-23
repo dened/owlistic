@@ -17,8 +17,7 @@ The Telc Certificate Checker Service checks the status of Telc certificates usin
 - [x] Set up Telegram bot
 - [x] Message sending
 - [x] Delete messages
-- [ ] Implement `/add_user`, `/show`, `/remove_user` commands
-- [ ] Implement `/check_now` command to trigger checks
+- [x] Implement a class for processing simple and compound commands in Telegram
 
 ### Iteration 4: Scheduled Checks
 - [ ] Implement scheduler (check users Monday to Friday, 8 AM - 6 PM)

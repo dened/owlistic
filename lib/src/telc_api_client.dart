@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:l/l.dart';
 import 'package:telc_result_checker/src/date_utils.dart';
@@ -9,14 +10,18 @@ typedef CertInfo = (
   String examId,
   String attendeeId,
 );
+
 final Converter<List<int>, Map<String, Object?>> _jsonDecoder =
     utf8.decoder.fuse(json.decoder).cast<List<int>, Map<String, Object?>>();
 
+/// [TelcApiClient] is a client for interacting with the Telc API.
+/// It provides methods to search for certificate information and fetch certificate data.
 class TelcApiClient {
   TelcApiClient({http.Client? client}) : _client = client ?? http.Client();
   static const String _baseUrl = 'https://results.telc.net/api/results'; // Base URL for the API
   final http.Client _client; // The HTTP client
 
+  /// Searches for certificate information based on the provided number, exam date, and birth date.
   Future<CertInfo> searchCertInfo(String nummer, DateTime pruefungDate, DateTime birthDate) async {
     final pruefungDateString = pruefungDate.toTeclFormat();
     final birthDateString = birthDate.toTeclFormat();
@@ -39,7 +44,9 @@ class TelcApiClient {
     }
   }
 
-  Future<CertificateEntity> fetchCertificateData(String examinationInstituteId, String examId, String attendeeId) async {
+  /// Fetches the certificate data based on the provided examination institute ID, exam ID, and attendee ID.
+  Future<CertificateEntity> fetchCertificateData(
+      String examinationInstituteId, String examId, String attendeeId) async {
     final url = Uri.parse('$_baseUrl/certificate/$examinationInstituteId/pruefungen/$examId/teilnehmer/$attendeeId');
     final response = await _client.get(url);
 
@@ -53,12 +60,13 @@ class TelcApiClient {
       });
       throw Exception('Certificate not found for the provided data.');
     } else {
-      l.w('Failed to fetch certificate data: ${response.statusCode}', StackTrace.current);
+      l.e('Failed to fetch certificate data: ${response.statusCode}');
       throw Exception('Failed to fetch certificate data: ${response.statusCode}');
     }
   }
 }
 
+/// [CertInfoNotFoundException] is thrown when the certificate information is not found
 class CertInfoNotFoundException implements Exception {
   CertInfoNotFoundException();
 

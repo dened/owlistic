@@ -32,6 +32,16 @@ class InlineKeyboardButton {
       };
 }
 
+/// Represents the parse mode for Telegram messages.
+enum ParseMode {
+  markdownV2('MarkdownV2'),
+  html('HTML'),
+  markdown('Markdown');
+
+  const ParseMode(this.type);
+  final String type;
+}
+
 /// A simple Telegram bot client.
 class TelegramBot {
   TelegramBot({
@@ -82,8 +92,9 @@ class TelegramBot {
     int chatId,
     String text, {
     bool disableNotification = true,
-    bool protectContent = true,
+    bool protectContent = false,
     bool autoEscapeMarkdown = true,
+    ParseMode parseMode = ParseMode.markdownV2,
     Map<String, Object?>? replyMarkup,
   }) async {
     final url = _buildMethodUri('sendMessage');
@@ -93,7 +104,7 @@ class TelegramBot {
         body: _jsonEncoder.convert(<String, Object?>{
           'chat_id': chatId,
           'text': autoEscapeMarkdown ? escapeMarkdownV2(text) : text,
-          'parse_mode': 'MarkdownV2',
+          'parse_mode': parseMode.type,
           'disable_notification': disableNotification,
           'protect_content': protectContent,
           if (replyMarkup != null) 'reply_markup': replyMarkup,

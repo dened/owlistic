@@ -20,7 +20,6 @@ The Telc Certificate Checker Service checks the status of Telc certificates usin
 - [x] Implement a class for processing simple and compound commands in Telegram
 
 ### Iteration 4: Scheduled Checks
-- [ ] Implement scheduler (check users Monday to Friday, 8 AM - 6 PM)
 - [x] Notify users via Telegram on check results
 
 ### Iteration 5: Manual Check Request
@@ -28,5 +27,5 @@ The Telc Certificate Checker Service checks the status of Telc certificates usin
 - [ ] Notify users of manual check results
 
 ### Iteration 6: Database Integration
-- [ ] Set up database (via drift)
-- [ ] Store and retrieve user data from the database
+- [x] Set up database (via drift)
+- [x] Store and retrieve user data from the database

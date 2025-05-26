@@ -1,23 +1,25 @@
-import 'package:json_annotation/json_annotation.dart';
-
-part 'search_info.g.dart';
-
-@JsonSerializable()
 class SearchInfo {
-
   SearchInfo({
-    required this.nummer,
-    required this.examDate,
-    required this.birthDate,
-  });
+    required int id,
+    required int chatId,
+    required String nummer,
+    required DateTime examDate,
+    required DateTime birthDate,
+  })  : _id = id,
+        _chatId = chatId,
+        _nummer = nummer,
+        _examDate = examDate,
+        _birthDate = birthDate;
 
-  factory SearchInfo.fromJson(Map<String, dynamic> json) => _$SearchInfoFromJson(json);
+  final int _id;
+  final int _chatId;
+  final String _nummer;
+  final DateTime _examDate;
+  final DateTime _birthDate;
 
-  final String nummer;
-  final DateTime examDate;
-  final DateTime birthDate;
-
-
-  Map<String, dynamic> toJson() => _$SearchInfoToJson(this);
+  int get id => _id;
+  int get chatId => _chatId;
+  String get nummer => _nummer;
+  DateTime get examDate => _examDate;
+  DateTime get birthDate => _birthDate;
 }
-

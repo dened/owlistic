@@ -8,7 +8,7 @@
             "name": "telc_result_checker",
             "request": "launch",
             "type": "dart",
-            "program": "bin/server.dart"
+            "program": "bin/telegram_bot.dart"
         }
     ]
 }

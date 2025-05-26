@@ -9,9 +9,11 @@ environment:
 dependencies:
   # Annotation
   json_annotation: ^4.9.0
+  meta: ^1.16.0
 
   # Utility
   args: ^2.6.0
+  collection: ^1.19.1
   path: ^1.9.1
   intl: ^0.20.2
 

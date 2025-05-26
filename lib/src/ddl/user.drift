@@ -1,0 +1,33 @@
+CREATE TABLE
+    user (
+        --req id in telegram
+        id INTEGER NOT NULL PRIMARY KEY,
+        -- User first_name
+        first_name TEXT,
+        -- User last_name
+        last_name TEXT,
+        -- User username
+        username TEXT,
+        -- User language code
+        language_code TEXT,
+        --req Created date(unixtime in seconds)
+        meta_created_at INTEGER NOT NULL DEFAULT (strftime ('%s', 'now')),
+        --req Updated date(unixtime in seconds)
+        meta_updated_at INTEGER NOT NULL DEFAULT (strftime ('%s', 'now')) CHECK (meta_updated_at >= meta_created_at)
+    ) STRICT;
+
+-- Indexes
+CREATE INDEX IF NOT EXISTS user_meta_created_at_idx ON user (meta_created_at);
+
+CREATE INDEX IF NOT EXISTS user_meta_updated_at_idx ON user (meta_updated_at);
+
+-- Triggers
+CREATE TRIGGER IF NOT EXISTS user_update_trigger AFTER
+UPDATE ON user BEGIN
+UPDATE user
+SET
+    meta_updated_at = strftime ('%s', 'now')
+WHERE
+    id = NEW.id;
+
+END;

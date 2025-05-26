@@ -1,4 +1,6 @@
 
+import 'package:intl/intl.dart';
+
 /// A constant that is true if the application was compiled in release mode.
 ///
 /// More specifically, this is a constant that is true if the application was
@@ -63,3 +65,6 @@ const String updateIdKey = 'last_update_id_key';
 
 // How many days back to check for the certificate
 const int daysForCheck = 21;
+
+
+final dateFormat = DateFormat('dd.MM.yyyy');

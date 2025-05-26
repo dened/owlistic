@@ -1,0 +1,39 @@
+CREATE TABLE
+    search_info (
+        --req id
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        --req id in telegram
+        user_id INTEGER NOT NULL,
+        --req attendee_number
+        attendee_number TEXT NOT NULL,
+        --req birth_date in unix time
+        birth_date INTEGER NOT NULL,
+        --req exam_date in unix time
+        exam_date INTEGER NOT NULL,
+        --req the data is not deleted, but is marked as deleted
+        is_deleted INTEGER NOT NULL DEFAULT 0,
+        --req whether the attendee number is valid
+        is_valid INTEGER NOT NULL DEFAULT 1,
+        --req Created date(unixtime in seconds)
+        meta_created_at INTEGER NOT NULL DEFAULT (strftime ('%s', 'now')),
+        --req Updated date(unixtime in seconds)
+        meta_updated_at INTEGER NOT NULL DEFAULT (strftime ('%s', 'now')) CHECK (meta_updated_at >= meta_created_at)
+    ) STRICT;
+
+-- Indexes
+CREATE INDEX IF NOT EXISTS search_info_meta_created_at_idx ON search_info (meta_created_at);
+
+CREATE INDEX IF NOT EXISTS search_info_meta_updated_at_idx ON search_info (meta_updated_at);
+
+CREATE INDEX IF NOT EXISTS search_info_user_id_idx ON search_info (user_id);
+
+-- Triggers
+CREATE TRIGGER IF NOT EXISTS search_info_update_trigger AFTER
+UPDATE ON search_info BEGIN
+UPDATE search_info
+SET
+    meta_updated_at = strftime ('%s', 'now')
+WHERE
+    id = NEW.id;
+
+END;

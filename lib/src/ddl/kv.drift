@@ -32,3 +32,4 @@ WHERE
     k = NEW.k;
 
 END;
+

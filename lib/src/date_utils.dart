@@ -18,4 +18,6 @@ List<DateTime> createCheckedDateList(DateTime examDate, DateTime currentTime, in
 
 extension DateTimeExtension on DateTime {
   String toTeclFormat() => toIso8601String().split('T').first;
+
+  int get secondsSinceEpoch => millisecondsSinceEpoch ~/ 1000;
 }

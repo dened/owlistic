@@ -1,11 +1,15 @@
 // ignore_for_file: prefer_foreach
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart' as ffi;
 import 'package:l/l.dart';
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 import 'package:telc_result_checker/src/constant/constants.dart';
+import 'package:telc_result_checker/src/dto/cetrificate_entity.dart';
+import 'package:telc_result_checker/src/dto/search_info.dart' as m;
 
 part 'database.g.dart';
 
@@ -36,9 +40,14 @@ abstract interface class IKeyValueStorage {
 @DriftDatabase(
   include: <String>{
     'ddl/kv.drift',
+    'ddl/certification.drift',
+    'ddl/search_info.drift',
+    'ddl/user.drift',
   },
 )
-class Database extends _$Database with _DatabaseKeyValueMixin implements IKeyValueStorage {
+class Database extends _$Database
+    with _DatabaseSearchInfoMixin, _DatabaseKeyValueMixin, _UserInfoMixin
+    implements IKeyValueStorage {
   Database.lazy({String? path, bool logStatements = false, bool dropDatabase = false})
       : super(LazyDatabase(
           () => _createQueryExecutor(
@@ -47,9 +56,6 @@ class Database extends _$Database with _DatabaseKeyValueMixin implements IKeyVal
             dropDatabase: dropDatabase,
           ),
         ));
-
-  @override
-  int get schemaVersion => 1;
 
   static Future<QueryExecutor> _createQueryExecutor({
     String? path,
@@ -90,6 +96,63 @@ class Database extends _$Database with _DatabaseKeyValueMixin implements IKeyVal
     }
 
     return ffi.NativeDatabase.createInBackground(file, logStatements: logStatements);
+  }
+
+  @override
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => DatabaseMigrationStrategy(db: this);
+}
+
+@immutable
+class DatabaseMigrationStrategy implements MigrationStrategy {
+  const DatabaseMigrationStrategy({
+    required Database db,
+  }) : _db = db;
+
+  /// Database to use for migrations.
+  final Database _db;
+
+  /// Executes when the database is created for the first time.
+  @override
+  OnCreate get onCreate => (migrator) async {
+        await migrator.createAll();
+      };
+
+  /// Executes after the database is ready to be used (ie. it has been opened
+  /// and all migrations ran), but before any other queries will be sent. This
+  /// makes it a suitable place to populate data after the database has been
+  /// created or set sqlite `PRAGMAS` that you need.
+  @override
+  OnBeforeOpen get beforeOpen => (details) async {
+        await _db.customStatement('PRAGMA foreign_keys = ON;');
+      };
+
+  /// Executes when the database has been opened previously, but the last access
+  /// happened at a different [GeneratedDatabase.schemaVersion].
+  /// Schema version upgrades and downgrades will both be run here.
+  @override
+  OnUpgrade get onUpgrade => (m, from, to) async {
+        if (from == to) return;
+        await _db.customStatement('PRAGMA foreign_keys = OFF;');
+        return _update(_db, m, from, to);
+      };
+
+  /// https://drift.simonbinder.eu/migrations/
+  static Future<void> _update(Database db, Migrator m, int from, int to) async {
+    if (from >= to) return;
+
+    switch (from) {
+      case 1:
+        await m.createAll();
+        break;
+      default:
+        if (kDebugMode) throw UnimplementedError('Unknown migration from $from to $to');
+    }
+
+    // Recursively upgrade to the latest version
+    await _update(db, m, from + 1, to);
   }
 }
 
@@ -196,4 +259,90 @@ mixin _DatabaseKeyValueMixin on _$Database implements IKeyValueStorage {
       (delete(kvTable)..where((tbl) => tbl.k.isIn(keys))).go().ignore();
     }
   }
+}
+
+mixin _UserInfoMixin on _$Database {
+  /// Saves user information into the database.
+  /// If the user already exists, it will update the existing record.
+  Future<void> saveUser({
+    required int id,
+    String? firstName,
+    String? lastName,
+    String? username,
+    String? languageCode,
+  }) async {
+    // Implement the logic to save user data into the database
+    await into(user).insertOnConflictUpdate(UserCompanion(
+      id: Value(id),
+      firstName: Value(firstName),
+      lastName: Value(lastName),
+      username: Value(username),
+      languageCode: Value(languageCode),
+    ));
+  }
+}
+
+mixin _DatabaseSearchInfoMixin on _$Database {
+  /// Get search info by userId ID and isRemoved == false
+  /// Returns a list of [SearchInfoData] for the given chat ID.
+  Future<List<m.SearchInfo>> getSearchInfo(int chatId) async {
+    final query = select(searchInfo)
+      ..where((tbl) =>
+          tbl.userId.equals(chatId) &
+          tbl.isDeleted.equals(0) &
+          notExistsQuery(select(certification)..where((cert) => cert.searchInfoId.equalsExp(tbl.id))));
+
+    return query.map((s) => s.toSearchInfo()).get();
+  }
+
+  /// Returns a list of [SearchInfo] that are valid and not deleted,
+  /// and for which there are no associated certifications.
+  /// This method orders the results by userId in ascending order.
+  Future<List<m.SearchInfo>> getAllSearchInfo() async {
+    final query = select(searchInfo)
+      ..where((tbl) =>
+          tbl.isValid.equals(1) &
+          tbl.isDeleted.equals(0) &
+          notExistsQuery(select(certification)..where((cert) => cert.searchInfoId.equalsExp(tbl.id))))
+      ..orderBy([(u) => OrderingTerm(expression: u.userId, mode: OrderingMode.asc)]);
+
+    return query.map((s) => s.toSearchInfo()).get();
+  }
+
+  /// Marks all search info records for a given chat ID as deleted.
+  Future<int> deleteAllSearchInfo(int chatId) {
+    assert(chatId > 0, 'Chat ID must be greater than 0');
+    return (update(searchInfo)..where((tbl) => tbl.userId.equals(chatId)))
+        .write(const SearchInfoCompanion(isDeleted: Value(1)));
+  }
+
+  /// Marks a search info record by its ID as deleted.
+  Future<int> deleteSearchInfo(int id) {
+    assert(id > 0, 'id must be greater than 0');
+    return (update(searchInfo)..where((tbl) => tbl.id.equals(id)))
+        .write(const SearchInfoCompanion(isDeleted: Value(1)));
+  }
+
+  Future<void> saveCertificate({
+    required int searchInfoId,
+    required String link,
+    required CertificateEntity entity,
+  }) async {
+    await into(certification).insert(CertificationCompanion(
+      searchInfoId: Value(searchInfoId),
+      link: Value(link),
+      data: Value(jsonEncode(entity.toJson())),
+    ));
+  }
+}
+
+extension SearchInfoDataExtension on SearchInfoData {
+  /// Converts this [SearchInfoData] to a [m.SearchInfo] object.
+  m.SearchInfo toSearchInfo() => m.SearchInfo(
+        id: id,
+        chatId: userId,
+        nummer: attendeeNumber,
+        examDate: DateTime.fromMillisecondsSinceEpoch(examDate * 1000),
+        birthDate: DateTime.fromMillisecondsSinceEpoch(birthDate * 1000),
+      );
 }

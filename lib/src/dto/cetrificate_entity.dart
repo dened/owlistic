@@ -234,4 +234,20 @@ extension CertificateContentExtension on CertificateEntity {
 
   Iterable<PointsAndTextContent> get resultInfo =>
       grades.content.whereType<PointsAndTextContent>();
+
+      String extractContent(CertificateContent content) => switch (content) {
+        Headline1Content h1 => h1.content,
+        Headline2Content h2 => h2.content,
+        LastnameContent last => last.content,
+        FirstnameContent first => first.content,
+        DateOfBirthContent dob => dob.content,
+        PlaceOfBirthContent pob => pob.content,
+        PointsAndTextContent pointsAndText => pointsAndText.points,
+        ResultTextContent resultText => resultText.content,
+        DateContent date => date.content,
+        TitleAndTextContent titleAndText => titleAndText.content,
+        AdditionalTextForSpecialConditionAndCreditAllocationContent additional =>
+            '${additional.specialConditions} ${additional.creditAllocation}',
+        _ => 'Unknown content type',
+      };
 }

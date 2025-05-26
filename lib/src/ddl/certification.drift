@@ -1,0 +1,20 @@
+CREATE TABLE
+    certification (
+        --req id
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        --req id in telegram
+        search_info_id INTEGER NOT NULL,
+        -- req link
+        link TEXT NOT NULL,
+        -- JSON data
+        data TEXT CHECK (
+            length (data) > 2
+            AND json_valid (data)
+        ),
+        --req Created date(unixtime in seconds)
+        meta_created_at INTEGER NOT NULL DEFAULT (strftime ('%s', 'now'))
+    ) STRICT;
+
+-- Indexes
+CREATE INDEX IF NOT EXISTS certification_meta_created_at_idx ON certification (meta_created_at);
+CREATE INDEX IF NOT EXISTS certification_search_info_id_idx ON certification (search_info_id);

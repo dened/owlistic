@@ -7,7 +7,8 @@
         {
             "name": "telc_result_checker",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "program": "bin/server.dart"
         }
     ]
 }

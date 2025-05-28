@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:l/l.dart';
 import 'package:telc_result_checker/src/date_utils.dart';
-import 'package:telc_result_checker/src/dto/cetrificate.dart';
+import 'package:telc_result_checker/src/dto/cetrificate_entity.dart';
 
 typedef CertInfo = (
   String examinationInstituteId,
@@ -39,12 +39,12 @@ class TelcApiClient {
     }
   }
 
-  Future<Certificate> fetchCertificateData(String examinationInstituteId, String examId, String attendeeId) async {
+  Future<CertificateEntity> fetchCertificateData(String examinationInstituteId, String examId, String attendeeId) async {
     final url = Uri.parse('$_baseUrl/certificate/$examinationInstituteId/pruefungen/$examId/teilnehmer/$attendeeId');
     final response = await _client.get(url);
 
     if (response.statusCode == 200) {
-      return Certificate.fromJson(_jsonDecoder.convert(response.bodyBytes));
+      return CertificateEntity.fromJson(_jsonDecoder.convert(response.bodyBytes));
     } else if (response.statusCode == 404) {
       l.e('Failed to fetch certificate data', StackTrace.current, {
         'examinationInstituteId': examinationInstituteId,

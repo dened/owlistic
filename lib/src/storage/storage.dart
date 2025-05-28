@@ -10,7 +10,7 @@ abstract interface class Storage {
   /// Initializes the storage. This method should be called before using any
   Future<void> refresh();
 
-  FutureOr<Map<String, List<SearchInfo>>> usersSearchInfoList();
+  FutureOr<Map<String, List<SearchInfo>>> usersSearchInfoMap();
   
   FutureOr<List<SearchInfo>> infoListById(String id);
 
@@ -67,7 +67,7 @@ final class FileStorage implements Storage {
   }
 
   @override
-  FutureOr<Map<String, List<SearchInfo>>> usersSearchInfoList() {
+  FutureOr<Map<String, List<SearchInfo>>> usersSearchInfoMap() {
     assert(_isInitialized, 'Storage must be initialized before use.');
     return _storage.map((key, user) => MapEntry(key, user.searchInfoList));
   }

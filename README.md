@@ -14,7 +14,9 @@ The Telc Certificate Checker Service checks the status of Telc certificates usin
 - [x] Implement reading user data from the file
 
 ### Iteration 3: Telegram Bot Integration
-- [ ] Set up Telegram bot
+- [x] Set up Telegram bot
+- [x] Message sending
+- [ ] Delete messages
 - [ ] Implement `/add_user`, `/show`, `/remove_user` commands
 - [ ] Implement `/check_now` command to trigger checks
 

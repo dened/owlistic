@@ -5,15 +5,15 @@ import 'package:owlistic/src/core/app_runner.dart';
 import 'package:owlistic/src/lookup_service/lookup_service_handler.dart';
 
 Future<void> main(List<String> args) async {
-  await runApplication(args, (db, bot, arguments) async {
+  await runApplication(args, (dependecies) async {
     final service = TelcCertificateLookupService(
       apiClient: TelcApiClient(),
-      db: db,
-      handler: TelegramNotificationHandler(bot: bot, db: db),
+      db: dependecies.db,
+      handler: TelegramNotificationHandler(bot: dependecies.bot, db: dependecies.db, ln: dependecies.ln),
     );
 
-    final chatId = arguments.chatId;
-    final checkDays = arguments.checkDays ?? defaultCountDaysForCheck;
+    final chatId = dependecies.arguments.chatId;
+    final checkDays = dependecies.arguments.checkDays ?? defaultCountDaysForCheck;
 
     if (chatId != null) {
       await service.checkByUser(chatId, checkDays);

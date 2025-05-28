@@ -63,4 +63,8 @@ const String updateIdKey = 'last_update_id_key';
 // How many days back to check for the certificate
 const int defaultCountDaysForCheck = 15;
 
+
 final dateFormat = DateFormat('dd.MM.yyyy');
+
+const defaultLocale = 'en';
+const supportedLocales = ['en', 'de', 'ru', 'uk'];

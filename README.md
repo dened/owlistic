@@ -30,8 +30,8 @@ The Owlistic checks the status of Telc certificates using their public API. User
 - [x] Set up database (via drift)
 - [x] Store and retrieve user data from the database
 ### Iteration 7: Localization
-- [ ] Add support for multiple languages in user notifications
-- [ ] Implement language selection for users
+- [x] Add support for multiple languages in user notifications
+- [x] Implement language selection for users
 
 ### Iteration 8: GDPR / DSGVO Compliance
 - [ ] Ensure user data is stored securely and encrypted

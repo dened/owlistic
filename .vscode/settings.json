@@ -31,7 +31,9 @@
     "**.freezed.dart",
     "**.gen.dart",
     "**.pb.dart",
-    "**/generated/**"
+    "**/generated/**",
+    "**messages_*.dart",
+    "**/l10n/**"
   ],
   "dart.additionalAnalyzerFileExtensions": [
     "drift"
@@ -64,7 +66,8 @@
     "*.dart": "i_$(capture).dart, $(capture).g.dart, $(capture).gr.dart, $(capture).freezed.dart, $(capture).config.dart, $(capture).chopper.dart, $(capture).drift, $(capture)_io.dart, $(capture)_web.dart, $(capture)_shared.dart, $(capture)_stub.dart",
     "*.graphql": "$(capture).gql.dart, $(capture).*.gql.dart",
     "firebase.json": " .firebaserc",
-    "main.dart": "runner_io.dart, runner_shared.dart, runner_stub.dart, runner_web.dart, runner_vm.dart, runner_js.dart, runner_wasm.dart, runner_mobile.dart, runner_desktop.dart"
+    "main.dart": "runner_io.dart, runner_shared.dart, runner_stub.dart, runner_web.dart, runner_vm.dart, runner_js.dart, runner_wasm.dart, runner_mobile.dart, runner_desktop.dart",
+    "messages_all.dart": "messages_*.dart"
   },
   "files.associations": {
     "*.drift": "sql"

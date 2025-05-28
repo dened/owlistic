@@ -1,0 +1,168 @@
+{
+  "@@last_modified": "2025-06-03T10:19:25.393384",
+  "@@locale": "ru",
+  "helpText": "Доступные команды:\n/help - Показать это сообщение помощи\n/start - Запустить бота\n/check_now - Проверить результат сейчас\n/language - Установить язык\n/add - Добавить новые данные\n/delete - Удалить данные\n/show - Показать все данные\n",
+  "@helpText": {
+    "description": "The help message listing all commands.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "startBotGreeting": "Бот запущен. Добро пожаловать!\nИспользуйте /help для просмотра доступных команд.",
+  "@startBotGreeting": {
+    "description": "Greeting message when the bot starts.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "checkNowStart": "Запуск проверки результатов...",
+  "@checkNowStart": {
+    "description": "Message shown when result check is initiated.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "languageSelectPompt": "Выберите предпочитаемый язык (Английский, Немецкий, Русский, Украинский):",
+  "@languageSelectPompt": {
+    "description": "Prompt to select a language.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "langEnglish": "Английский",
+  "@langEnglish": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "langGerman": "Немецкий",
+  "@langGerman": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "langRussian": "Русский",
+  "@langRussian": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "langUkrainian": "Украинский",
+  "@langUkrainian": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "languageSelectedCallback": "Язык выбран: {displayName}",
+  "@languageSelectedCallback": {
+    "description": "Confirmation message after language selection.",
+    "type": "text",
+    "placeholders": {
+      "displayName": {
+        "example": "Русский"
+      }
+    }
+  },
+  "addPromptAttendeeNumber": "Введите ваш 7-значный номер участника экзамена (например, 0312345).",
+  "@addPromptAttendeeNumber": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "addPromptBirthDate": "Введите вашу дату рождения в формате ДД.ММ.ГГГГ.",
+  "@addPromptBirthDate": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "addInvalidAttendeeNumber": "Неверный номер участника. Он должен состоять из 7 цифр (например, 0312345).\nЕсли вы уверены, что номер правильный, введите его еще раз.\nЕсли вы не знаете свой номер, введите 000, чтобы пропустить этот шаг.",
+  "@addInvalidAttendeeNumber": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "addInvalidBirthDate": "Неверный формат даты рождения!\nПожалуйста, введите дату в формате ДД.ММ.ГГГГ.",
+  "@addInvalidBirthDate": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "addPromptExamDate": "Введите дату вашего экзамена в формате ДД.ММ.ГГГГ.",
+  "@addPromptExamDate": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "addInvalidExamDate": "Неверный формат даты экзамена!\nПожалуйста, введите дату в формате {dateFormatPattern}.",
+  "@addInvalidExamDate": {
+    "type": "text",
+    "placeholders": {
+      "dateFormatPattern": {
+        "example": "ДД.ММ.ГГГГ"
+      }
+    }
+  },
+  "addSuccess": "Информация успешно добавлена!\nВы можете просмотреть список добавленных записей с помощью /show или добавить новую с помощью /add.\nДля удаления данных используйте команду /delete.",
+  "@addSuccess": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "showNoData": "Данные еще не добавлены. Используйте /add для добавления новых записей.",
+  "@showNoData": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "showListHeader": "Список добавленных записей:\n",
+  "@showListHeader": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "showExamDatePrefix": "Экзамен:",
+  "@showExamDatePrefix": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteNoData": "Данные еще не добавлены. Нечего удалять.",
+  "@deleteNoData": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteButtonDeleteAll": "Удалить все",
+  "@deleteButtonDeleteAll": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteSelectPrompt": "Выберите запись для удаления или нажмите \"Удалить все\", чтобы удалить все записи.",
+  "@deleteSelectPrompt": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteAllSuccessCallback": "Все записи успешно удалены.",
+  "@deleteAllSuccessCallback": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteOneSuccessCallback": "Запись успешно удалена.",
+  "@deleteOneSuccessCallback": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "certNotFoundMessage": "Результаты не найдены за последние {daysCount} дней для пользователя {attendeeNumber}",
+  "@certNotFoundMessage": {
+    "description": "Message when no certificate is found for a user after a certain number of days.",
+    "type": "text",
+    "placeholders": {
+      "daysCount": {
+        "example": 7
+      },
+      "attendeeNumber": {
+        "example": "1234567"
+      }
+    }
+  },
+  "certFoundTitle": "Сертификат найден!",
+  "@certFoundTitle": {
+    "description": "Title indicating a certificate was found.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "certFoundFullNameLabel": "ФИО:",
+  "@certFoundFullNameLabel": {
+    "description": "Label for the full name of the certificate holder.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "certFoundLinkText": "Ссылка на сертификат",
+  "@certFoundLinkText": {
+    "description": "Text for the hyperlink to the certificate.",
+    "type": "text",
+    "placeholders": {}
+  }
+}

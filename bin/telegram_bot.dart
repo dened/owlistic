@@ -1,9 +1,10 @@
 import 'dart:async';
 
-import 'package:drift/drift.dart';
+import 'package:l/l.dart';
 import 'package:owlistic/owlistic.dart';
 import 'package:owlistic/src/core/app_runner.dart';
 import 'package:owlistic/src/date_utils.dart';
+import 'package:owlistic/src/localization/localization.dart';
 import 'package:owlistic/src/telegram_bot/command_handler.dart';
 import 'package:owlistic/src/telegram_bot/command_proccessor.dart';
 import 'package:owlistic/src/telegram_bot/conversation_handler.dart';
@@ -12,96 +13,97 @@ import 'package:owlistic/src/telegram_bot/external_lookup_service.dart';
 /// Runs the Telegram bot.
 ///
 Future<void> main(List<String> args) async {
-  await runApplication(args, (db, bot, arguments) async {
-    bot
-      ..addHandler(handler(bot: bot, db: db))
+  await runApplication(args, (dependencies) async {
+    // Initialize and start the Telegram bot.
+    // The main handler function is registered here.
+    dependencies.bot
+      ..addHandler(handler(bot: dependencies.bot, db: dependencies.db, ln: dependencies.ln))
       ..start();
   });
 }
 
+/// Creates the main update handler for the Telegram bot.
+/// This function sets up the command processor and all command/conversation handlers.
+/// It also ensures that each update is processed within the correct localization context.
+///
+/// Returns a function that will be called by the Telegram bot library for each incoming update.
 void Function(int updateId, Map<String, Object?> update) handler({
   required TelegramBot bot,
   required Database db,
+  required Localization ln,
 }) {
   final commandProcessor = CommandProcessor(
     bot: bot,
     db: db,
   )
+    // Handler for the /help command.
     ..addHandler(
       CommandHandler('/help', (ctx) async {
-        await ctx.bot.sendMessage(
-          ctx.chatId!,
-          'Available commands:\n'
-          '/help - Show this help message\n'
-          '/start - Start the bot\n'
-          '/check_now - Check result now\n'
-          '/language - Set language\n'
-          '/add - Add new data\n'
-          '/delete - Delete data\n'
-          '/show - Show all data\n',
-        );
+        await ctx.bot.sendMessage(ctx.chatId!, ln.helpText);
       }),
     )
+    // Handler for the /start command.
     ..addHandler(
       CommandHandler('/start', (ctx) async {
-        await ctx.db.saveUser(
+        ctx.db.saveUser(
           id: ctx.chatId!,
+          // Extract user information from the context.
           firstName: ctx.chat?['first_name'] as String?,
           lastName: ctx.chat?['last_name'] as String?,
           username: ctx.chat?['username'] as String?,
-          languageCode: ctx.chat?['language_code'] as String? ?? 'ru',
+          languageCode: ctx.chat?['language_code'] as String?,
         );
-        await ctx.bot.sendMessage(
-          ctx.chatId!,
-          'Start the bot\n',
-        );
+
+        await ctx.bot.sendMessage(ctx.chatId!, ln.startBotGreeting);
       }),
     )
+    // Handler for the /check_now command.
     ..addHandler(
       CommandHandler('/check_now', (ctx) async {
+        final messageId = await ctx.bot.sendMessage(ctx.chatId!, ln.checkNowStart);
+        // Attempt to parse 'checkDays' argument, if provided.
         final checkDays = int.tryParse(ctx.getArgs()?['/check_now'] ?? '');
-
         await ExternalLookupService.run(ctx.chatId!, checkDays: checkDays);
+        // Delete the "Starting results check..." message after a delay.
+        Future.delayed(const Duration(seconds: 5), () => ctx.bot.deleteMessage(ctx.chatId!, messageId));
       }),
     )
+    // Conversation handler for the /language command.
     ..addHandler(ConversationHandler('/language', (ctx, state) async {
-      await ctx.bot.sendInlineKeyboard(
-          ctx.chatId!, 'Выберите язык из поддерживаемых(Английский, Немецкий, Русский, Украинский):', [
-        [
-          InlineKeyboardButton(text: 'Английский', callbackData: 'en'),
-          InlineKeyboardButton(text: 'Немецкий', callbackData: 'de'),
-        ],
-        [
-          InlineKeyboardButton(text: 'Русский', callbackData: 'ru'),
-          InlineKeyboardButton(text: 'Украинский', callbackData: 'uk'),
-        ],
-      ]);
+      // Send the language selection prompt with an inline keyboard.
+      await ctx.bot.sendInlineKeyboard(ctx.chatId!, ln.languageSelectPompt, ln.languageSelectionKeyboard);
       return 0;
     }, steps: {
+      // Step 0: Process the user's language selection from the callback query.
       0: (ctx, state) async {
-        final language = ctx.callbackData;
-        if (language == null || language.isEmpty) {
-          await ctx.bot.sendMessage(ctx.chatId!, 'Please provide a valid language.');
+        final languageCode = ctx.callbackData;
+        if (languageCode == null || languageCode.isEmpty) {
+          l.w('Callback data for language selection is empty or null.');
           return 0;
         }
 
-        await ctx.bot.answerCallbackQuery(ctx.callbackId, 'Выбран язык: $language');
+        ctx.db.saveUserLanguageCode(ctx.chatId!, languageCode);
+
+        /// Since the user's language code has just been saved,
+        /// we use `ln.withChatId` to ensure the callback message is localized correctly in the user's selected language.
+        final languageSelectedCallback = await ln.withChatId(ctx.chatId!, () {
+          final displayName = ln.getDisplayNameForLanguageCode(languageCode);
+          return ln.languageSelectedCallback(displayName);
+        });
+        await ctx.bot.answerCallbackQuery(ctx.callbackId, languageSelectedCallback);
         await ctx.bot.deleteMessage(ctx.chatId!, ctx.messageId!);
-        await (ctx.db.update(ctx.db.user)..where((tbl) => tbl.id.equals(ctx.chatId!))).write(UserCompanion(
-          languageCode: Value<String?>(language),
-        ));
         return ConversationHandler.finish;
       },
     }))
+    // Conversation handler for the /add command (to add exam search info).
     ..addHandler(ConversationHandler('/add', (ctx, state) async {
-      // Define the entry logic here
-      await ctx.bot.sendMessage(
-        ctx.chatId!,
-        'Введите номер участника экзамена. \nНомер должен состоять из 7 цифр(например: 0312345).',
-      );
+      // Prompt for the attendee number.
+      final addPromptAttendeeNumber = await ln.withChatId(ctx.chatId!, () => ln.addPromptAttendeeNumber);
+      await ctx.bot.sendMessage(ctx.chatId!, addPromptAttendeeNumber);
       return AddConversationStep.number.index;
     }, steps: <int, ConversationStep>{
       AddConversationStep.number.index: (ctx, state) async {
+        // Validate the entered attendee number.
         final number = ctx.text ?? '';
         if ([
           RegExp(r'^\d{7}$').hasMatch(number),
@@ -109,42 +111,43 @@ void Function(int updateId, Map<String, Object?> update) handler({
           number == state['number'],
         ].any((element) => element)) {
           state['number'] = number;
-          await ctx.bot.sendMessage(ctx.chatId!, 'Введите дату рождения в формате ДД.ММ.ГГГГ');
+          final addPromptBirthDate = await ln.withChatId(ctx.chatId!, () => ln.addPromptBirthDate);
+          // If valid, prompt for the birth date.
+          await ctx.bot.sendMessage(ctx.chatId!, addPromptBirthDate);
           return AddConversationStep.birthDate.index;
         }
-
-        await ctx.bot.sendMessage(
-            ctx.chatId!,
-            'Номер участника неверный. Номер должен состоять из 7 цифр(например: 0312345).\n'
-            'Если вы уверены, что этот номер правильный, то введите его еще раз.\n'
-            'Если вы не знаете свой номер, то введите 000 для пропуска этого шага.');
+        final addInvalidAttendeeNumber = await ln.withChatId(ctx.chatId!, () => ln.addInvalidAttendeeNumber);
+        // If invalid, send an error message and ask again.
+        await ctx.bot.sendMessage(ctx.chatId!, addInvalidAttendeeNumber);
         state['number'] = number;
         return AddConversationStep.number.index;
       },
       AddConversationStep.birthDate.index: (ctx, state) async {
+        final addInvalidBirthDate = await ln.withChatId(ctx.chatId!, () => ln.addInvalidBirthDate);
         final birthDate = ctx.text ?? '';
+        // Validate the entered birth date format.
         if (dateFormat.tryParse(birthDate) == null) {
-          await ctx.bot.sendMessage(
-              ctx.chatId!, 'Дата рождения введена неверно!\nПожалуйста, введите дату в формате ДД.ММ.ГГГГ');
+          await ctx.bot.sendMessage(ctx.chatId!, addInvalidBirthDate);
           return AddConversationStep.birthDate.index;
         }
+        final addPromptExamDate = await ln.withChatId(ctx.chatId!, () => ln.addPromptExamDate);
+        // If valid, prompt for the exam date.
         state['birthDate'] = birthDate;
-        await ctx.bot.sendMessage(ctx.chatId!, 'Введите дату экзамена в формате ДД.ММ.ГГГГ');
+        await ctx.bot.sendMessage(ctx.chatId!, addPromptExamDate);
         return AddConversationStep.examDate.index;
       },
       AddConversationStep.examDate.index: (ctx, state) async {
         final number = state['number'] as String?;
         final birthDate = state['birthDate'] as String?;
         final examDate = ctx.text ?? '';
-
+        // Validate the entered exam date format.
         if (dateFormat.tryParse(examDate) == null) {
-          await ctx.bot.sendMessage(
-              ctx.chatId!,
-              'Дата экзамена введена неверно!\n'
-              'Пожалуйста, введите дату в формате ${dateFormat.pattern}');
+          final addInvalidExamDate = await ln.withChatId(ctx.chatId!, () => ln.addInvalidExamDate(dateFormat.pattern!));
+          await ctx.bot.sendMessage(ctx.chatId!, addInvalidExamDate);
           return AddConversationStep.examDate.index;
         }
 
+        // Save the collected information to the database.
         await ctx.db.into(ctx.db.searchInfo).insertOnConflictUpdate(
               SearchInfoCompanion.insert(
                 userId: ctx.chatId!,
@@ -153,28 +156,26 @@ void Function(int updateId, Map<String, Object?> update) handler({
                 examDate: dateFormat.parse(examDate).secondsSinceEpoch,
               ),
             );
-
-        await ctx.bot.sendMessage(
-            ctx.chatId!,
-            'Информация успешно добавлена!\n'
-            'Вы можете посмотреть список добавленных номеров '
-            'с помощью команды /show или добавить новый номер с помощью команды /add.\n'
-            'Для удаления данных используйте команду /delete.');
-
+        final addSuccess = await ln.withChatId(ctx.chatId!, () => ln.addSuccess);
+        // Send a success message.
+        await ctx.bot.sendMessage(ctx.chatId!, addSuccess);
         return ConversationHandler.finish;
       },
     }))
+    // Handler for the /show command.
     ..addHandler(CommandHandler('/show', (ctx) async {
       final searchInfoList = await ctx.db.getSearchInfo(ctx.chatId!);
       if (searchInfoList.isEmpty) {
-        await ctx.bot.sendMessage(ctx.chatId!, 'Нет добавленных номеров. Используйте /add для добавления.');
+        // If no data, send a corresponding message.
+        await ctx.bot.sendMessage(ctx.chatId!, ln.showNoData);
         return;
       }
-      final message = StringBuffer('Список добавленных номеров:\n');
+      // Format and send the list of search entries.
+      final message = StringBuffer(ln.showListHeader);
       for (final searchInfo in searchInfoList) {
         message.writeln(
           '${searchInfo.nummer} - ${dateFormat.format(searchInfo.birthDate)}. '
-          'Экзамен: ${dateFormat.format(searchInfo.examDate)}',
+          '${ln.showExamDatePrefix} ${dateFormat.format(searchInfo.examDate)}',
         );
       }
       await ctx.bot.sendMessage(
@@ -182,15 +183,17 @@ void Function(int updateId, Map<String, Object?> update) handler({
         message.toString(),
       );
     }))
+    // Conversation handler for the /delete command.
     ..addHandler(ConversationHandler('/delete', (ctx, state) async {
       final searchInfoList = await ctx.db.getSearchInfo(ctx.chatId!);
       if (searchInfoList.isEmpty) {
-        await ctx.bot.sendMessage(ctx.chatId!, 'Нет добавленных номеров. Используйте /add для добавления.');
+        // If no data, send a message and finish.
+        await ctx.bot.sendMessage(ctx.chatId!, ln.deleteNoData);
         return ConversationHandler.finish;
       }
 
-      // Преобразовать список searchInfoList в массив списков по 5 элементов
       const rowLength = 5;
+      // Create an inline keyboard with buttons for each entry and a "Delete All" button.
       final inlineKeyboard = <List<InlineKeyboardButton>>[];
       for (var i = 0; i < searchInfoList.length; i += rowLength) {
         final row = searchInfoList
@@ -206,47 +209,62 @@ void Function(int updateId, Map<String, Object?> update) handler({
 
       inlineKeyboard.add([
         InlineKeyboardButton(
-          text: 'Удалить все',
+          text: ln.deleteButtonDeleteAll,
           callbackData: 'all',
         )
       ]);
 
-      await ctx.bot.sendInlineKeyboard(ctx.chatId!,
-          'Выберите номер для удаления или нажмите "Удалить все" для удаления всех записей.', inlineKeyboard);
+      await ctx.bot.sendInlineKeyboard(ctx.chatId!, ln.deleteSelectPrompt, inlineKeyboard);
 
       return DeleteStep.select.index;
     }, steps: {
+      // Step for processing the deletion choice.
       DeleteStep.select.index: (ctx, state) async {
         final value = ctx.callbackData ?? '';
 
         if (value == 'all') {
+          // If "Delete All" is selected.
           await ctx.db.deleteAllSearchInfo(ctx.chatId!);
-          await ctx.bot.answerCallbackQuery(ctx.callbackId, 'Все записи успешно удалены.');
+          await ctx.bot.answerCallbackQuery(ctx.callbackId, ln.deleteAllSuccessCallback);
           await ctx.bot.deleteMessage(ctx.chatId!, ctx.messageId!);
           return ConversationHandler.finish;
         }
-
+        // If a specific entry is selected for deletion.
         final index = int.parse(value);
-
         await ctx.db.deleteSearchInfo(index);
-
-        await ctx.bot.answerCallbackQuery(ctx.callbackId, 'Запись успешно удалена.');
+        await ctx.bot.answerCallbackQuery(ctx.callbackId, ln.deleteOneSuccessCallback);
         await ctx.bot.deleteMessage(ctx.chatId!, ctx.messageId!);
         return ConversationHandler.finish;
       },
     }));
 
+  // This is the function that will be called for each incoming update.
   return (int updateId, Map<String, Object?> update) {
-    commandProcessor(update);
+    // Extract chatId from the update using pattern matching.
+    // This handles both regular messages and callback queries.
+    final chatId = switch (update) {
+      {'message': {'chat': {'id': final int id}}} => id,
+      {'callback_query': {'message': {'chat': {'id': final int id}}}} => id,
+      _ => null,
+    };
+
+    if (chatId != null) {
+      // Process the incoming update (e.g., a command or callback query)
+      // within the locale context of the user associated with the chatId.
+      // This ensures that any localized strings are retrieved in the user's language.
+      ln.withChatId(chatId, () => commandProcessor(update));
+    }
   };
 }
 
+// Defines the steps for the '/add' command conversation.
 enum AddConversationStep {
   number,
   birthDate,
   examDate,
 }
 
+// Defines the steps for the '/delete' command conversation.
 enum DeleteStep {
   select,
 }

@@ -16,6 +16,7 @@ analyzer:
     # Generated
     - "**.g.dart"
     - "**.freezed.dart"
+    - "lib/src/localization/l10n/**"
 
     # Platform
     - "macos/**"

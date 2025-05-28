@@ -1,0 +1,168 @@
+{
+  "@@last_modified": "2025-06-03T10:19:25.393384",
+  "@@locale": "de",
+  "helpText": "Verfügbare Befehle:\n/help - Diese Hilfenachricht anzeigen\n/start - Den Bot starten\n/check_now - Ergebnis jetzt prüfen\n/language - Sprache einstellen\n/add - Neue Daten hinzufügen\n/delete - Daten löschen\n/show - Alle Daten anzeigen\n",
+  "@helpText": {
+    "description": "The help message listing all commands.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "startBotGreeting": "Bot gestartet. Willkommen!\nNutze /help, um verfügbare Befehle zu sehen.",
+  "@startBotGreeting": {
+    "description": "Greeting message when the bot starts.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "checkNowStart": "Ergebnisprüfung wird gestartet...",
+  "@checkNowStart": {
+    "description": "Message shown when result check is initiated.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "languageSelectPompt": "Wählen Sie Ihre bevorzugte Sprache (Englisch, Deutsch, Russisch, Ukrainisch):",
+  "@languageSelectPompt": {
+    "description": "Prompt to select a language.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "langEnglish": "Englisch",
+  "@langEnglish": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "langGerman": "Deutsch",
+  "@langGerman": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "langRussian": "Russisch",
+  "@langRussian": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "langUkrainian": "Ukrainisch",
+  "@langUkrainian": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "languageSelectedCallback": "Sprache ausgewählt: {displayName}",
+  "@languageSelectedCallback": {
+    "description": "Confirmation message after language selection.",
+    "type": "text",
+    "placeholders": {
+      "displayName": {
+        "example": "Deutsch"
+      }
+    }
+  },
+  "addPromptAttendeeNumber": "Geben Sie Ihre 7-stellige Prüfungsteilnehmernummer ein (z.B. 0312345).",
+  "@addPromptAttendeeNumber": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "addPromptBirthDate": "Geben Sie Ihr Geburtsdatum im Format TT.MM.JJJJ ein.",
+  "@addPromptBirthDate": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "addInvalidAttendeeNumber": "Ungültige Teilnehmernummer. Sie muss 7-stellig sein (z.B. 0312345).\nWenn Sie sicher sind, dass die Nummer korrekt ist, geben Sie sie bitte erneut ein.\nWenn Sie Ihre Nummer nicht kennen, geben Sie 000 ein, um diesen Schritt zu überspringen.",
+  "@addInvalidAttendeeNumber": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "addInvalidBirthDate": "Ungültiges Geburtsdatumsformat!\nBitte geben Sie das Datum im Format TT.MM.JJJJ ein.",
+  "@addInvalidBirthDate": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "addPromptExamDate": "Geben Sie Ihr Prüfungsdatum im Format TT.MM.JJJJ ein.",
+  "@addPromptExamDate": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "addInvalidExamDate": "Ungültiges Prüfungsdatumsformat!\nBitte geben Sie das Datum im Format {dateFormatPattern} ein.",
+  "@addInvalidExamDate": {
+    "type": "text",
+    "placeholders": {
+      "dateFormatPattern": {
+        "example": "TT.MM.JJJJ"
+      }
+    }
+  },
+  "addSuccess": "Informationen erfolgreich hinzugefügt!\nSie können die Liste der hinzugefügten Einträge mit /show anzeigen oder mit /add einen neuen hinzufügen.\nUm Daten zu löschen, verwenden Sie den Befehl /delete.",
+  "@addSuccess": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "showNoData": "Noch keine Daten hinzugefügt. Verwenden Sie /add, um neue Einträge hinzuzufügen.",
+  "@showNoData": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "showListHeader": "Liste der hinzugefügten Einträge:\n",
+  "@showListHeader": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "showExamDatePrefix": "Prüfung:",
+  "@showExamDatePrefix": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteNoData": "Noch keine Daten hinzugefügt. Nichts zu löschen.",
+  "@deleteNoData": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteButtonDeleteAll": "Alles löschen",
+  "@deleteButtonDeleteAll": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteSelectPrompt": "Wählen Sie einen Eintrag zum Löschen aus oder klicken Sie auf \"Alles löschen\", um alle Einträge zu entfernen.",
+  "@deleteSelectPrompt": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteAllSuccessCallback": "Alle Einträge erfolgreich gelöscht.",
+  "@deleteAllSuccessCallback": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteOneSuccessCallback": "Eintrag erfolgreich gelöscht.",
+  "@deleteOneSuccessCallback": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "certNotFoundMessage": "Für Benutzer {attendeeNumber} wurden in den letzten {daysCount} Tagen keine Ergebnisse gefunden",
+  "@certNotFoundMessage": {
+    "description": "Message when no certificate is found for a user after a certain number of days.",
+    "type": "text",
+    "placeholders": {
+      "daysCount": {
+        "example": 7
+      },
+      "attendeeNumber": {
+        "example": "1234567"
+      }
+    }
+  },
+  "certFoundTitle": "Zertifikat gefunden!",
+  "@certFoundTitle": {
+    "description": "Title indicating a certificate was found.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "certFoundFullNameLabel": "Vollständiger Name:",
+  "@certFoundFullNameLabel": {
+    "description": "Label for the full name of the certificate holder.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "certFoundLinkText": "Zertifikat-Link",
+  "@certFoundLinkText": {
+    "description": "Text for the hyperlink to the certificate.",
+    "type": "text",
+    "placeholders": {}
+  }
+}

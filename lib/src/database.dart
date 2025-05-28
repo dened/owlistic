@@ -1,4 +1,5 @@
 // ignore_for_file: prefer_foreach
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -262,23 +263,71 @@ mixin _DatabaseKeyValueMixin on _$Database implements IKeyValueStorage {
 }
 
 mixin _UserInfoMixin on _$Database {
+  final Map<int, String> _cacheLocale = <int, String>{};
+
   /// Saves user information into the database.
   /// If the user already exists, it will update the existing record.
-  Future<void> saveUser({
+  void saveUser({
     required int id,
     String? firstName,
     String? lastName,
     String? username,
     String? languageCode,
-  }) async {
+  }) {
     // Implement the logic to save user data into the database
-    await into(user).insertOnConflictUpdate(UserCompanion(
-      id: Value(id),
-      firstName: Value(firstName),
-      lastName: Value(lastName),
-      username: Value(username),
-      languageCode: Value(languageCode),
+    into(user)
+        .insertOnConflictUpdate(UserCompanion(
+          id: Value(id),
+          firstName: Value(firstName),
+          lastName: Value(lastName),
+          username: Value(username),
+          languageCode: Value(_normolizeLanguageCode(languageCode)),
+        ))
+        .ignore();
+  }
+
+  /// Returns the locale for the given chat ID.
+  /// If the locale is not found in the cache, it retrieves it from the database
+  /// and caches it for future use.
+  FutureOr<String> getUserLocale(int chatId) async {
+    assert(chatId > 0, 'Chat ID must be greater than 0');
+    final cachedLocale = _cacheLocale[chatId];
+    if (cachedLocale != null) return cachedLocale;
+
+    final locale = await (select(user)..where((tbl) => tbl.id.equals(chatId))).map((u) => u.languageCode).getSingle();
+    _cacheLocale[chatId] = locale!;
+    return locale;
+  }
+
+  /// Normalizes the language code to ensure it is one of the supported locales.
+  /// If the language code is null or not supported, it returns the default locale.
+
+  String _normolizeLanguageCode(String? languageCode) {
+    if (languageCode == null) return defaultLocale;
+    final code = languageCode.length > 2 ? languageCode.substring(0, 2) : languageCode;
+    if (supportedLocales.contains(code)) return code;
+
+    return defaultLocale;
+  }
+
+  void saveUserLanguageCode(int chatId, String languageCode) {
+    _cacheLocale[chatId] = languageCode;
+    (update(user)..where((tbl) => tbl.id.equals(chatId))).write(UserCompanion(
+      languageCode: Value<String?>(_normolizeLanguageCode(languageCode)),
     ));
+  }
+
+  /// Gets the language code for a given user.
+  /// If the language code is not found in the cache, it retrieves it from the
+  /// database and caches it for future use.
+  FutureOr<String> getUserLanguageCode(int chatId) async {
+    assert(chatId > 0, 'Chat ID must be greater than 0');
+    final cachedCode = _cacheLocale[chatId];
+    if (cachedCode != null) return cachedCode;
+
+    final code = await (select(user)..where((tbl) => tbl.id.equals(chatId))).map((u) => u.languageCode).getSingle();
+    _cacheLocale[chatId] = code!;
+    return code;
   }
 }
 

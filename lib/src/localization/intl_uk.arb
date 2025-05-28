@@ -1,0 +1,168 @@
+{
+  "@@last_modified": "2025-06-03T10:19:25.393384",
+  "@@locale": "uk",
+  "helpText": "Доступні команди:\n/help - Показати це повідомлення допомоги\n/start - Запустити бота\n/check_now - Перевірити результат зараз\n/language - Встановити мову\n/add - Додати нові дані\n/delete - Видалити дані\n/show - Показати всі дані\n",
+  "@helpText": {
+    "description": "The help message listing all commands.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "startBotGreeting": "Бот запущено. Ласкаво просимо!\nВикористовуйте /help для перегляду доступних команд.",
+  "@startBotGreeting": {
+    "description": "Greeting message when the bot starts.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "checkNowStart": "Запуск перевірки результатів...",
+  "@checkNowStart": {
+    "description": "Message shown when result check is initiated.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "languageSelectPompt": "Виберіть бажану мову (Англійська, Німецька, Російська, Українська):",
+  "@languageSelectPompt": {
+    "description": "Prompt to select a language.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "langEnglish": "Англійська",
+  "@langEnglish": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "langGerman": "Німецька",
+  "@langGerman": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "langRussian": "Російська",
+  "@langRussian": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "langUkrainian": "Українська",
+  "@langUkrainian": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "languageSelectedCallback": "Мову вибрано: {displayName}",
+  "@languageSelectedCallback": {
+    "description": "Confirmation message after language selection.",
+    "type": "text",
+    "placeholders": {
+      "displayName": {
+        "example": "Українська"
+      }
+    }
+  },
+  "addPromptAttendeeNumber": "Введіть ваш 7-значний номер учасника іспиту (наприклад, 0312345).",
+  "@addPromptAttendeeNumber": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "addPromptBirthDate": "Введіть вашу дату народження у форматі ДД.ММ.РРРР.",
+  "@addPromptBirthDate": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "addInvalidAttendeeNumber": "Неправильний номер учасника. Він повинен складатися з 7 цифр (наприклад, 0312345).\nЯкщо ви впевнені, що номер правильний, введіть його ще раз.\nЯкщо ви не знаєте свій номер, введіть 000, щоб пропустити цей крок.",
+  "@addInvalidAttendeeNumber": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "addInvalidBirthDate": "Неправильний формат дати народження!\nБудь ласка, введіть дату у форматі ДД.ММ.РРРР.",
+  "@addInvalidBirthDate": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "addPromptExamDate": "Введіть дату вашого іспиту у форматі ДД.ММ.РРРР.",
+  "@addPromptExamDate": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "addInvalidExamDate": "Неправильний формат дати іспиту!\nБудь ласка, введіть дату у форматі {dateFormatPattern}.",
+  "@addInvalidExamDate": {
+    "type": "text",
+    "placeholders": {
+      "dateFormatPattern": {
+        "example": "ДД.ММ.РРРР"
+      }
+    }
+  },
+  "addSuccess": "Інформацію успішно додано!\nВи можете переглянути список доданих записів за допомогою /show або додати новий за допомогою /add.\nДля видалення даних використовуйте команду /delete.",
+  "@addSuccess": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "showNoData": "Дані ще не додано. Використовуйте /add для додавання нових записів.",
+  "@showNoData": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "showListHeader": "Список доданих записів:\n",
+  "@showListHeader": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "showExamDatePrefix": "Іспит:",
+  "@showExamDatePrefix": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteNoData": "Дані ще не додано. Немає чого видаляти.",
+  "@deleteNoData": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteButtonDeleteAll": "Видалити все",
+  "@deleteButtonDeleteAll": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteSelectPrompt": "Виберіть запис для видалення або натисніть \"Видалити все\", щоб видалити всі записи.",
+  "@deleteSelectPrompt": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteAllSuccessCallback": "Всі записи успішно видалено.",
+  "@deleteAllSuccessCallback": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteOneSuccessCallback": "Запис успішно видалено.",
+  "@deleteOneSuccessCallback": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "certNotFoundMessage": "Результатів не знайдено за останні {daysCount} днів для користувача {attendeeNumber}",
+  "@certNotFoundMessage": {
+    "description": "Message when no certificate is found for a user after a certain number of days.",
+    "type": "text",
+    "placeholders": {
+      "daysCount": {
+        "example": 7
+      },
+      "attendeeNumber": {
+        "example": "1234567"
+      }
+    }
+  },
+  "certFoundTitle": "Сертифікат знайдено!",
+  "@certFoundTitle": {
+    "description": "Title indicating a certificate was found.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "certFoundFullNameLabel": "Повне ім'я:",
+  "@certFoundFullNameLabel": {
+    "description": "Label for the full name of the certificate holder.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "certFoundLinkText": "Посилання на сертифікат",
+  "@certFoundLinkText": {
+    "description": "Text for the hyperlink to the certificate.",
+    "type": "text",
+    "placeholders": {}
+  }
+}

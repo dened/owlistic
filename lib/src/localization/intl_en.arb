@@ -1,0 +1,168 @@
+{
+  "@@last_modified": "2025-06-03T10:19:25.393384",
+  "@@locale": "en",
+  "helpText": "Available commands:\n/help - Show this help message\n/start - Start the bot\n/check_now - Check result now\n/language - Set language\n/add - Add new data\n/delete - Delete data\n/show - Show all data\n",
+  "@helpText": {
+    "description": "The help message listing all commands.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "startBotGreeting": "Bot started. Welcome!\nUse /help to see available commands.",
+  "@startBotGreeting": {
+    "description": "Greeting message when the bot starts.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "checkNowStart": "Starting results check...",
+  "@checkNowStart": {
+    "description": "Message shown when result check is initiated.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "languageSelectPompt": "Select your preferred language (English, German, Russian, Ukrainian):",
+  "@languageSelectPompt": {
+    "description": "Prompt to select a language.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "langEnglish": "English",
+  "@langEnglish": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "langGerman": "German",
+  "@langGerman": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "langRussian": "Russian",
+  "@langRussian": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "langUkrainian": "Ukrainian",
+  "@langUkrainian": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "languageSelectedCallback": "Language selected: {displayName}",
+  "@languageSelectedCallback": {
+    "description": "Confirmation message after language selection.",
+    "type": "text",
+    "placeholders": {
+      "displayName": {
+        "example": "English"
+      }
+    }
+  },
+  "addPromptAttendeeNumber": "Enter your 7-digit exam attendee number (e.g., 0312345).",
+  "@addPromptAttendeeNumber": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "addPromptBirthDate": "Enter your birth date in DD.MM.YYYY format.",
+  "@addPromptBirthDate": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "addInvalidAttendeeNumber": "Invalid attendee number. It must be 7 digits (e.g., 0312345).\nIf you are sure the number is correct, please enter it again.\nIf you do not know your number, enter 000 to skip this step.",
+  "@addInvalidAttendeeNumber": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "addInvalidBirthDate": "Invalid birth date format!\nPlease enter the date in DD.MM.YYYY format.",
+  "@addInvalidBirthDate": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "addPromptExamDate": "Enter your exam date in DD.MM.YYYY format.",
+  "@addPromptExamDate": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "addInvalidExamDate": "Invalid exam date format!\nPlease enter the date in {dateFormatPattern} format.",
+  "@addInvalidExamDate": {
+    "type": "text",
+    "placeholders": {
+      "dateFormatPattern": {
+        "example": "DD.MM.YYYY"
+      }
+    }
+  },
+  "addSuccess": "Information added successfully!\nYou can view the list of added entries with /show or add a new one with /add.\nTo delete data, use the /delete command.",
+  "@addSuccess": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "showNoData": "No data added yet. Use /add to add new entries.",
+  "@showNoData": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "showListHeader": "List of added entries:\n",
+  "@showListHeader": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "showExamDatePrefix": "Exam:",
+  "@showExamDatePrefix": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteNoData": "No data added yet. Nothing to delete.",
+  "@deleteNoData": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteButtonDeleteAll": "Delete All",
+  "@deleteButtonDeleteAll": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteSelectPrompt": "Select an entry to delete, or click \"Delete All\" to remove all entries.",
+  "@deleteSelectPrompt": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteAllSuccessCallback": "All entries successfully deleted.",
+  "@deleteAllSuccessCallback": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteOneSuccessCallback": "Entry successfully deleted.",
+  "@deleteOneSuccessCallback": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "certNotFoundMessage": "No results found for the last {daysCount} days for user {attendeeNumber}",
+  "@certNotFoundMessage": {
+    "description": "Message when no certificate is found for a user after a certain number of days.",
+    "type": "text",
+    "placeholders": {
+      "daysCount": {
+        "example": 7
+      },
+      "attendeeNumber": {
+        "example": "1234567"
+      }
+    }
+  },
+  "certFoundTitle": "Certificate found!",
+  "@certFoundTitle": {
+    "description": "Title indicating a certificate was found.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "certFoundFullNameLabel": "Full Name:",
+  "@certFoundFullNameLabel": {
+    "description": "Label for the full name of the certificate holder.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "certFoundLinkText": "Certificate Link",
+  "@certFoundLinkText": {
+    "description": "Text for the hyperlink to the certificate.",
+    "type": "text",
+    "placeholders": {}
+  }
+}

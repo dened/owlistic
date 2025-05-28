@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:l/l.dart';
 import 'package:owlistic/owlistic.dart';
+import 'package:owlistic/src/core/dependencies.dart';
+import 'package:owlistic/src/localization/localization.dart';
 
 /// An abstraction for running an application with common initialization.
 ///
@@ -14,13 +17,11 @@ Future<void> runApplication(
   /// The command-line arguments.
   List<String> args,
   Future<void> Function(
-    Database db,
-    TelegramBot bot,
-    Arguments arguments,
+    Dependencies dependencies,
   ) app,
 ) async {
   final arguments = Arguments.parse(args);
-
+  await initializeDateFormatting('ru');
   l.capture<void>(
     // Run the application within a zoned guard to catch top-level errors.
     () => runZonedGuarded<void>(() async {
@@ -34,9 +35,11 @@ Future<void> runApplication(
         token: arguments.token,
         offset: lastUpdateId,
       );
+      final ln = Localization(db: db);
+      await ln.initializeAllMessages();
 
       // Execute the application-specific logic.
-      await app(db, bot, arguments);
+      await app(Dependencies(db: db, bot: bot, arguments: arguments, ln: ln));
     }, (error, stackTrace) {
       l.e('An top level error occurred. $error', stackTrace);
       debugger(); // Set a breakpoint here

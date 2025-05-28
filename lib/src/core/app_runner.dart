@@ -1,0 +1,68 @@
+import 'dart:async';
+import 'dart:developer';
+
+import 'package:intl/intl.dart';
+import 'package:l/l.dart';
+import 'package:telc_result_checker/owlistic.dart'; 
+
+
+/// An abstraction for running an application with common initialization.
+///
+/// The [app] function contains the unique logic for a specific application
+/// (e.g., a periodic task or a Telegram bot).
+/// It will be called after the common components have been initialized.
+Future<void> runApplication(
+  /// The command-line arguments.
+  List<String> args,
+  Future<void> Function(
+    Database db,
+    TelegramBot bot,
+    Arguments arguments,
+  ) app,
+) async {
+  final arguments = Arguments.parse(args);
+
+  l.capture<void>(
+    // Run the application within a zoned guard to catch top-level errors.
+    () => runZonedGuarded<void>(() async {
+      final db = Database.lazy();
+      await db.refresh();
+      l.i('Database is ready');
+
+      // Retrieve the last update ID for the Telegram bot.
+      final lastUpdateId = db.getKey<int>(updateIdKey);
+      final bot = TelegramBot(
+        token: arguments.token,
+        offset: lastUpdateId, 
+      );
+
+      // Execute the application-specific logic.
+      await app(db, bot, arguments);
+    }, (error, stackTrace) {
+      l.e('An top level error occurred. $error', stackTrace);
+      debugger(); // Set a breakpoint here
+    }),
+    LogOptions(
+      handlePrint: true,
+      outputInRelease: true,
+      printColors: true, // Keep colors for console output, can be false if not needed.
+      overrideOutput: (event) {
+        // Filter logs based on verbosity level.
+        if (event.level.level > arguments.verbose.level) return null;
+        var message = switch (event.message) { // Convert message to string.
+          String text => text,
+          Object obj => obj.toString(),
+        };
+        if (kReleaseMode) {
+          // Hide sensitive data in release mode
+          if (arguments.token case String key when key.isNotEmpty) {
+            message = message.replaceAll(key, '******');
+          }
+        }
+        return '[${event.level.prefix}] '
+            '${DateFormat('dd.MM.yyyy HH:mm:ss').format(event.timestamp)} '
+            '| $message';
+      },
+    ),
+  );
+}

@@ -53,4 +53,25 @@ class Context {
 
     return commands;
   }
+
+  Map<String, String?>? getArgs() {
+    final txt = text;
+    if (txt == null) return null;
+
+    final commands = getCommands();
+    if (commands == null) return null;
+
+    final args = <String, String?>{};
+    for (final command in commands) {
+      final argStart = txt.indexOf(command) + command.length;
+      final argEnd = txt.indexOf('/', argStart);
+
+      final arg = txt.substring(argStart, argEnd > 0 ? argEnd : txt.length).trim();
+      if (arg.isNotEmpty) {
+        args[command] = arg;
+      }
+    }
+
+    return args;
+  }
 }

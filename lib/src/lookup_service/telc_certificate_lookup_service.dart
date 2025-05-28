@@ -1,13 +1,17 @@
 import 'package:l/l.dart';
-import 'package:telc_result_checker/src/constant/constants.dart';
+
 import 'package:telc_result_checker/src/database.dart' show Database;
 import 'package:telc_result_checker/src/date_utils.dart';
+import 'package:telc_result_checker/src/dto/search_info.dart';
 import 'package:telc_result_checker/src/lookup_service/lookup_service_handler.dart';
-import 'package:telc_result_checker/src/retry.dart';
 import 'package:telc_result_checker/src/lookup_service/telc_api_client.dart';
+import 'package:telc_result_checker/src/retry.dart';
+
+const batchSize = 3;
+const batchDelay = Duration(seconds: 2);
 
 /// [TelcCertificateLookupService] lookup certificates using the Telc API.
-/// This service is responsible for searching for certificates based on
+/// This service is responsible for searching for Telc certificates based on
 /// user-provided information such as number, birth date, and exam date.
 /// It handles the lookup process, including searching for certificate information
 /// and fetching the certificate data from the API.
@@ -26,17 +30,33 @@ final class TelcCertificateLookupService {
   final Database _db;
   final LookupServiceHandler _handler;
 
-  /// Starts the certificate lookup process.
-  /// It retrieves the search information from storage,
-  /// flattens it into a list of search tasks, and processes them in batches.
-  Future<void> start() async {
-    // final usersSearchInfoMap = await storage.usersSearchInfoMap();
-    // Flatten all search tasks into a single list with chatId
+  /// Checks all stored search information for certificates.
+  ///
+  /// Retrieves all [SearchInfo] entries from the database that are pending a check
+  /// and processes them to find corresponding certificates.
+  /// The [daysForCheck] parameter specifies the number of days around the exam date to check.
+  Future<void> checkAll(int daysForCheck) async {
+    // Retrieve all search tasks that need to be processed.
     final allSearchTasks = await _db.getAllSearchInfo();
+    await _checkSearchInfoList(allSearchTasks, daysForCheck);
+  }
 
-    const batchSize = 3;
-    const batchDelay = Duration(seconds: 2);
+  /// Checks search information for a specific user (identified by [chatId]).
+  ///
+  /// Retrieves [SearchInfo] entries for the given [chatId] from the database
+  /// and processes them to find corresponding certificates.
+  /// The [daysForCheck] parameter specifies the number of days around the exam date to check.
+  Future<void> checkByUser(int chatId, int daysForCheck) async {
+    final searchTask = await _db.getSearchInfo(chatId);
+    await _checkSearchInfoList(searchTask,  daysForCheck);
+  }
 
+  /// Processes a list of [SearchInfo] tasks in batches to find certificates.
+  ///
+  /// Iterates through the [allSearchTasks], processing them in batches of [batchSize].
+  /// For each task, it attempts to find certificate information and then fetches the certificate.
+  /// The [daysForCheck] parameter specifies the number of days around the exam date to check.
+  Future<void> _checkSearchInfoList(List<SearchInfo> allSearchTasks, int daysForCheck ) async {
     for (var i = 0; i < allSearchTasks.length; i += batchSize) {
       final batch = allSearchTasks.skip(i).take(batchSize);
       await Future.wait(batch.map((info) async {
@@ -65,7 +85,7 @@ final class TelcCertificateLookupService {
           l.d('Certificate data: $certificate');
         } on CertInfoNotFoundException {
           l.i('Certificate not found for ${info.nummer} on ${info.examDate.toTeclFormat()}');
-          _handler.certNotFound(info).ignore();
+          _handler.certNotFound(daysForCheck, info).ignore();
         } on Object catch (error, stackTrace) {
           l.e('An error occurred while checking certificates: $error', stackTrace);
         }
@@ -78,7 +98,8 @@ final class TelcCertificateLookupService {
   }
 
   /// Looks up the certificate information for a given [number] and [birthDate].
-  /// It searches for the certificate information in a range of [dateList]
+  /// It iterates through the provided [dateList] (issue dates) to find a matching certificate.
+  /// Returns a [CertInfo] tuple containing `(examinationInstituteId, examId, attendeeId)` if found.
   Future<CertInfo> _lookupCert(String nummer, DateTime birthDate, List<DateTime> dateList) async {
     l.i('🔍 Starting search from ${dateList.first.toTeclFormat()} to ${dateList.last.toTeclFormat()} for $nummer...');
     for (final date in dateList) {

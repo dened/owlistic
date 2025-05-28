@@ -9,6 +9,17 @@
             "request": "launch",
             "type": "dart",
             "program": "bin/telegram_bot.dart"
-        }
+        },
+        {
+            "name": "Dart: Debug lookup_service",
+            "type": "dart",
+            "request": "launch",
+            "program": "bin/lookup_service.dart",
+            "args": [
+
+                "--chat-id", "6552159924",
+                "--check-days", "15" 
+            ]
+        },
     ]
 }

@@ -1,69 +1,29 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:drift/drift.dart';
-import 'package:intl/intl.dart';
-import 'package:l/l.dart';
 import 'package:telc_result_checker/owlistic.dart';
-import 'package:telc_result_checker/src/database.dart';
+import 'package:telc_result_checker/src/core/app_runner.dart';
 import 'package:telc_result_checker/src/date_utils.dart';
 import 'package:telc_result_checker/src/telegram_bot/command_handler.dart';
 import 'package:telc_result_checker/src/telegram_bot/command_proccessor.dart';
 import 'package:telc_result_checker/src/telegram_bot/conversation_handler.dart';
-import 'package:telc_result_checker/src/telegram_bot/telegram_bot.dart';
+import 'package:telc_result_checker/src/telegram_bot/external_lookup_service.dart';
 
+/// Runs the Telegram bot.
+///
 Future<void> main(List<String> args) async {
-  final arguments = Arguments.parse(args);
-
-  l.capture(
-    () => runZonedGuarded<void>(() async {
-      final db = Database.lazy();
-      await db.refresh();
-      l.i('Database is ready');
-      final lastUpdateId = db.getKey<int>(updateIdKey);
-      final bot = TelegramBot(
-        token: arguments.token,
-        offset: lastUpdateId,
-      );
-
-      bot
-        ..addHandler(handler(
-          bot: bot,
-          db: db,
-        ))
-        ..start();
-    }, (error, stackTrace) {
-      l.e('An top level error occurred. $error', stackTrace);
-      debugger(); // Set a breakpoint here
-    }),
-    LogOptions(
-      handlePrint: true,
-      outputInRelease: true,
-      printColors: false,
-      overrideOutput: (event) {
-        //logsBuffer.add(event);
-        if (event.level.level > arguments.verbose.level) return null;
-        var message = switch (event.message) {
-          String text => text,
-          Object obj => obj.toString(),
-        };
-        if (kReleaseMode) {
-          // Hide sensitive data in release mode
-          if (arguments.token case String key when key.isNotEmpty) message = message.replaceAll(key, '******');
-        }
-        return '[${event.level.prefix}] '
-            '${DateFormat('dd.MM.yyyy HH:mm:ss').format(event.timestamp)} '
-            '| $message';
-      },
-    ),
-  );
+  await runApplication(args, (db, bot, arguments) async {
+    bot
+      ..addHandler(handler(bot: bot, db: db))
+      ..start();
+  });
 }
 
 void Function(int updateId, Map<String, Object?> update) handler({
   required TelegramBot bot,
   required Database db,
 }) {
-  final messageHandler = CommandProcessor(
+  final commandProcessor = CommandProcessor(
     bot: bot,
     db: db,
   )
@@ -74,6 +34,7 @@ void Function(int updateId, Map<String, Object?> update) handler({
           'Available commands:\n'
           '/help - Show this help message\n'
           '/start - Start the bot\n'
+          '/check_now - Check result now\n'
           '/language - Set language\n'
           '/add - Add new data\n'
           '/delete - Delete data\n'
@@ -94,6 +55,13 @@ void Function(int updateId, Map<String, Object?> update) handler({
           ctx.chatId!,
           'Start the bot\n',
         );
+      }),
+    )
+    ..addHandler(
+      CommandHandler('/check_now', (ctx) async {
+        final checkDays = int.tryParse(ctx.getArgs()?['/check_now'] ?? '');
+        
+        await ExternalLookupService.run(ctx.chatId!, checkDays: checkDays);
       }),
     )
     ..addHandler(ConversationHandler('/language', (ctx, state) async {
@@ -174,7 +142,7 @@ void Function(int updateId, Map<String, Object?> update) handler({
               ctx.chatId!,
               'Дата экзамена введена неверно!\n'
               'Пожалуйста, введите дату в формате ${dateFormat.pattern}');
-          return AddConversationStep.birthDate.index;
+          return AddConversationStep.examDate.index;
         }
 
         await ctx.db.into(ctx.db.searchInfo).insertOnConflictUpdate(
@@ -269,7 +237,7 @@ void Function(int updateId, Map<String, Object?> update) handler({
     }));
 
   return (int updateId, Map<String, Object?> update) {
-    messageHandler(update);
+    commandProcessor(update);
   };
 }
 

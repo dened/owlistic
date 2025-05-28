@@ -8,7 +8,7 @@ abstract interface class LookupServiceHandler {
   Future<void> certFound(
       {required SearchInfo searchInfo, required String link, required CertificateEntity certificate});
 
-  Future<void> certNotFound(SearchInfo searchInfo);
+  Future<void> certNotFound(int daysCount, SearchInfo searchInfo);
 }
 
 final class TelegramNotificationHandler implements LookupServiceHandler {
@@ -22,7 +22,7 @@ final class TelegramNotificationHandler implements LookupServiceHandler {
   final Database _db;
 
   @override
-  Future<void> certNotFound(SearchInfo searchInfo) async {
+  Future<void> certNotFound(int daysCount, SearchInfo searchInfo) async {
     final messageId = _db.getKey<int>(searchInfo.key);
 
     // If a message ID exists, delete the previous message
@@ -36,7 +36,7 @@ final class TelegramNotificationHandler implements LookupServiceHandler {
     try {
       final messageId = await _bot.sendMessage(
         searchInfo.chatId,
-        'Результатов не найдено за последние 15 дней для пользователя ${searchInfo.nummer}',
+        'Результатов не найдено за последние $daysCount дней для пользователя ${searchInfo.nummer}',
       );
       _db.setKey(searchInfo.key, messageId);
       l.i('Saved message ID $messageId for ${searchInfo.nummer}');
@@ -116,15 +116,4 @@ final class TelegramNotificationHandler implements LookupServiceHandler {
 
 extension on SearchInfo {
   String get key => 'key_$id';
-}
-
-String formatCertificate(CertificateEntity certrificate) {
-  // final grades = switch(certrificate.grades.content) {
-  //     PointsAndTextContent pointsAndText => pointsAndText.points,
-  //     ResultTextContent resultText => resultText.content,
-  //   _ => '',
-  // };
-  // gr
-  // switch( certrificate.grades)
-  return '';
 }

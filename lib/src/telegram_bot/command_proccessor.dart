@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:telc_result_checker/src/database.dart';
 import 'package:telc_result_checker/src/telegram_bot/base_handler.dart';
 import 'package:telc_result_checker/src/telegram_bot/context.dart';

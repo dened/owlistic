@@ -23,9 +23,17 @@ The Telc Certificate Checker Service checks the status of Telc certificates usin
 - [x] Notify users via Telegram on check results
 
 ### Iteration 5: Manual Check Request
-- [ ] Implement `/check_now` for manual certificate check
-- [ ] Notify users of manual check results
+- [x] Implement `/check_now` for manual certificate check
+- [x] Notify users of manual check results
 
 ### Iteration 6: Database Integration
 - [x] Set up database (via drift)
 - [x] Store and retrieve user data from the database
+### Iteration 7: Localization
+- [ ] Add support for multiple languages in user notifications
+- [ ] Implement language selection for users
+
+### Iteration 8: GDPR / DSGVO Compliance
+- [ ] Ensure user data is stored securely and encrypted
+- [ ] Add functionality to delete user data upon request
+- [ ] Update privacy policy to reflect GDPR / DSGVO compliance

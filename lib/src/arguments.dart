@@ -7,6 +7,8 @@ final class Arguments {
     required this.token,
     required this.file,
     required this.verbose,
+    required this.checkDays,
+    required this.chatId,
   });
 
   factory Arguments.parse(List<String> arguments) {
@@ -31,12 +33,26 @@ final class Arguments {
         defaultsTo: 'all',
         help: 'Verbose mode for output: all | debug | info | warn | error',
         valueHelp: 'info',
+      )
+      ..addOption(
+        'chat-id',
+        abbr: 'c',
+        help: 'Chat ID for manually checking results',
+        valueHelp: '12345678',
+      )
+      ..addOption(
+        'check-days',
+        abbr: 'd',
+        help: 'How many days to check for search certificate',
+        valueHelp: '15',
       );
 
     const options = <String>{
       'token',
       'verbose',
       'file',
+      'chat-id',
+      'check-days',
     };
 
     try {
@@ -71,6 +87,8 @@ final class Arguments {
           'e' || 'err' || 'error' || 'severe' || 'fatal' => const logger.LogLevel.error(),
           _ => const logger.LogLevel.warning(),
         },
+        chatId: int.tryParse(table['chat-id'] ?? ''),
+        checkDays: int.tryParse(table['check-days'] ?? ''),
       );
     } on FormatException catch (e) {
       io.stderr.writeln('Error: ${e.message}');
@@ -82,4 +100,7 @@ final class Arguments {
   final String file;
 
   final logger.LogLevel verbose;
+
+  final int? chatId;
+  final int? checkDays;
 }

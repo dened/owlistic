@@ -1,4 +1,3 @@
-
 import 'package:intl/intl.dart';
 
 /// A constant that is true if the application was compiled in release mode.
@@ -59,12 +58,9 @@ const bool kProfileMode = bool.fromEnvironment('dart.vm.profile');
 ///  * [kProfileMode], which is true in profile builds.
 const bool kDebugMode = !kReleaseMode && !kProfileMode;
 
-
 const String updateIdKey = 'last_update_id_key';
 
-
 // How many days back to check for the certificate
-const int daysForCheck = 21;
-
+const int defaultCountDaysForCheck = 15;
 
 final dateFormat = DateFormat('dd.MM.yyyy');

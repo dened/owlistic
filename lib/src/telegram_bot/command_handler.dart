@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:telc_result_checker/src/telegram_bot/base_handler.dart';
-import 'package:telc_result_checker/src/telegram_bot/context.dart';
+import 'package:owlistic/src/telegram_bot/base_handler.dart';
+import 'package:owlistic/src/telegram_bot/context.dart';
 
 typedef Handler = FutureOr<void> Function(Context ctx);
 

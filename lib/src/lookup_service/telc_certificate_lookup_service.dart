@@ -1,11 +1,11 @@
 import 'package:l/l.dart';
 
-import 'package:telc_result_checker/src/database.dart' show Database;
-import 'package:telc_result_checker/src/date_utils.dart';
-import 'package:telc_result_checker/src/dto/search_info.dart';
-import 'package:telc_result_checker/src/lookup_service/lookup_service_handler.dart';
-import 'package:telc_result_checker/src/lookup_service/telc_api_client.dart';
-import 'package:telc_result_checker/src/retry.dart';
+import 'package:owlistic/src/database.dart' show Database;
+import 'package:owlistic/src/date_utils.dart';
+import 'package:owlistic/src/dto/search_info.dart';
+import 'package:owlistic/src/lookup_service/lookup_service_handler.dart';
+import 'package:owlistic/src/lookup_service/telc_api_client.dart';
+import 'package:owlistic/src/retry.dart';
 
 const batchSize = 3;
 const batchDelay = Duration(seconds: 2);
@@ -48,7 +48,7 @@ final class TelcCertificateLookupService {
   /// The [daysForCheck] parameter specifies the number of days around the exam date to check.
   Future<void> checkByUser(int chatId, int daysForCheck) async {
     final searchTask = await _db.getSearchInfo(chatId);
-    await _checkSearchInfoList(searchTask,  daysForCheck);
+    await _checkSearchInfoList(searchTask, daysForCheck);
   }
 
   /// Processes a list of [SearchInfo] tasks in batches to find certificates.
@@ -56,7 +56,7 @@ final class TelcCertificateLookupService {
   /// Iterates through the [allSearchTasks], processing them in batches of [batchSize].
   /// For each task, it attempts to find certificate information and then fetches the certificate.
   /// The [daysForCheck] parameter specifies the number of days around the exam date to check.
-  Future<void> _checkSearchInfoList(List<SearchInfo> allSearchTasks, int daysForCheck ) async {
+  Future<void> _checkSearchInfoList(List<SearchInfo> allSearchTasks, int daysForCheck) async {
     for (var i = 0; i < allSearchTasks.length; i += batchSize) {
       final batch = allSearchTasks.skip(i).take(batchSize);
       await Future.wait(batch.map((info) async {

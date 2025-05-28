@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:l/l.dart';
-import 'package:telc_result_checker/src/date_utils.dart';
-import 'package:telc_result_checker/src/dto/cetrificate_entity.dart';
+import 'package:owlistic/src/date_utils.dart';
+import 'package:owlistic/src/dto/cetrificate_entity.dart';
 
 typedef CertInfo = (
   String examinationInstituteId,

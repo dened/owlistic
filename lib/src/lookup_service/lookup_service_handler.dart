@@ -1,8 +1,8 @@
 import 'package:l/l.dart';
-import 'package:telc_result_checker/src/database.dart' show Database;
-import 'package:telc_result_checker/src/dto/cetrificate_entity.dart';
-import 'package:telc_result_checker/src/dto/search_info.dart';
-import 'package:telc_result_checker/src/telegram_bot/telegram_bot.dart';
+import 'package:owlistic/src/database.dart' show Database;
+import 'package:owlistic/src/dto/cetrificate_entity.dart';
+import 'package:owlistic/src/dto/search_info.dart';
+import 'package:owlistic/src/telegram_bot/telegram_bot.dart';
 
 abstract interface class LookupServiceHandler {
   Future<void> certFound(

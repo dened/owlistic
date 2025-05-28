@@ -1,6 +1,6 @@
-# Telc Certificate Checker Service
+# Owlistic
 
-The Telc Certificate Checker Service checks the status of Telc certificates using their public API. Users can submit their certificate details, and the service will automatically check for the certificate status. It notifies users of the results via a Telegram bot. The service supports both automatic periodic checks and manual checks initiated by the user.
+The Owlistic checks the status of Telc certificates using their public API. Users can submit their certificate details, and the service will automatically check for the certificate status. It notifies users of the results via a Telegram bot. The service supports both automatic periodic checks and manual checks initiated by the user.
 
 ---
 

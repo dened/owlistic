@@ -1,8 +1,8 @@
-import 'package:telc_result_checker/src/database.dart';
-import 'package:telc_result_checker/src/telegram_bot/base_handler.dart';
-import 'package:telc_result_checker/src/telegram_bot/context.dart';
-import 'package:telc_result_checker/src/telegram_bot/conversation_handler.dart';
-import 'package:telc_result_checker/src/telegram_bot/telegram_bot.dart';
+import 'package:owlistic/src/database.dart';
+import 'package:owlistic/src/telegram_bot/base_handler.dart';
+import 'package:owlistic/src/telegram_bot/context.dart';
+import 'package:owlistic/src/telegram_bot/conversation_handler.dart';
+import 'package:owlistic/src/telegram_bot/telegram_bot.dart';
 
 /// Обработчик сообщений, имплементирующий OnUpdateHandler.
 class CommandProcessor {
@@ -53,6 +53,3 @@ class CommandProcessor {
     _handlers.add(handler);
   }
 }
-
-
-

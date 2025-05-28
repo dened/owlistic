@@ -1,13 +1,13 @@
 import 'dart:async';
 
 import 'package:drift/drift.dart';
-import 'package:telc_result_checker/owlistic.dart';
-import 'package:telc_result_checker/src/core/app_runner.dart';
-import 'package:telc_result_checker/src/date_utils.dart';
-import 'package:telc_result_checker/src/telegram_bot/command_handler.dart';
-import 'package:telc_result_checker/src/telegram_bot/command_proccessor.dart';
-import 'package:telc_result_checker/src/telegram_bot/conversation_handler.dart';
-import 'package:telc_result_checker/src/telegram_bot/external_lookup_service.dart';
+import 'package:owlistic/owlistic.dart';
+import 'package:owlistic/src/core/app_runner.dart';
+import 'package:owlistic/src/date_utils.dart';
+import 'package:owlistic/src/telegram_bot/command_handler.dart';
+import 'package:owlistic/src/telegram_bot/command_proccessor.dart';
+import 'package:owlistic/src/telegram_bot/conversation_handler.dart';
+import 'package:owlistic/src/telegram_bot/external_lookup_service.dart';
 
 /// Runs the Telegram bot.
 ///
@@ -60,7 +60,7 @@ void Function(int updateId, Map<String, Object?> update) handler({
     ..addHandler(
       CommandHandler('/check_now', (ctx) async {
         final checkDays = int.tryParse(ctx.getArgs()?['/check_now'] ?? '');
-        
+
         await ExternalLookupService.run(ctx.chatId!, checkDays: checkDays);
       }),
     )

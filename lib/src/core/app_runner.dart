@@ -3,8 +3,7 @@ import 'dart:developer';
 
 import 'package:intl/intl.dart';
 import 'package:l/l.dart';
-import 'package:telc_result_checker/owlistic.dart'; 
-
+import 'package:owlistic/owlistic.dart';
 
 /// An abstraction for running an application with common initialization.
 ///
@@ -33,7 +32,7 @@ Future<void> runApplication(
       final lastUpdateId = db.getKey<int>(updateIdKey);
       final bot = TelegramBot(
         token: arguments.token,
-        offset: lastUpdateId, 
+        offset: lastUpdateId,
       );
 
       // Execute the application-specific logic.
@@ -49,7 +48,8 @@ Future<void> runApplication(
       overrideOutput: (event) {
         // Filter logs based on verbosity level.
         if (event.level.level > arguments.verbose.level) return null;
-        var message = switch (event.message) { // Convert message to string.
+        var message = switch (event.message) {
+          // Convert message to string.
           String text => text,
           Object obj => obj.toString(),
         };

@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "telc_result_checker",
+            "name": "owlistic",
             "request": "launch",
             "type": "dart",
             "program": "bin/telegram_bot.dart"

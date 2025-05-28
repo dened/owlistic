@@ -7,9 +7,9 @@ import 'package:drift/native.dart' as ffi;
 import 'package:l/l.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
-import 'package:telc_result_checker/src/constant/constants.dart';
-import 'package:telc_result_checker/src/dto/cetrificate_entity.dart';
-import 'package:telc_result_checker/src/dto/search_info.dart' as m;
+import 'package:owlistic/src/constant/constants.dart';
+import 'package:owlistic/src/dto/cetrificate_entity.dart';
+import 'package:owlistic/src/dto/search_info.dart' as m;
 
 part 'database.g.dart';
 

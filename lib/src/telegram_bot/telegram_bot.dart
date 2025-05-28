@@ -4,7 +4,7 @@ import 'dart:math' as math;
 
 import 'package:http/http.dart' as http;
 import 'package:l/l.dart';
-import 'package:telc_result_checker/src/retry.dart';
+import 'package:owlistic/src/retry.dart';
 
 final Converter<List<int>, Map<String, Object?>> _jsonDecoder =
     utf8.decoder.fuse(json.decoder).cast<List<int>, Map<String, Object?>>();

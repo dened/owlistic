@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:telc_result_checker/src/telegram_bot/context.dart';
+import 'package:owlistic/src/telegram_bot/context.dart';
 
 abstract class BaseHandler {
   bool canHandle(Context ctx);

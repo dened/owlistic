@@ -1,5 +1,5 @@
-import 'package:telc_result_checker/src/database.dart';
-import 'package:telc_result_checker/src/telegram_bot/telegram_bot.dart';
+import 'package:owlistic/src/database.dart';
+import 'package:owlistic/src/telegram_bot/telegram_bot.dart';
 
 class Context {
   Context({

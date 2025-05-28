@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:telc_result_checker/owlistic.dart';
-import 'package:telc_result_checker/src/core/app_runner.dart';
-import 'package:telc_result_checker/src/lookup_service/lookup_service_handler.dart';
+import 'package:owlistic/owlistic.dart';
+import 'package:owlistic/src/core/app_runner.dart';
+import 'package:owlistic/src/lookup_service/lookup_service_handler.dart';
 
 Future<void> main(List<String> args) async {
   await runApplication(args, (db, bot, arguments) async {
@@ -22,4 +22,3 @@ Future<void> main(List<String> args) async {
     }
   });
 }
-

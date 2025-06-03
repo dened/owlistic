@@ -1,7 +1,7 @@
 name: owlistic
 description: A server app using the shelf package and Docker.
 version: 0.0.1
-# repository: https://github.com/my_org/my_repo
+# repository: https://github.com/dened/owlistic
 
 environment:
   sdk: ^3.5.4

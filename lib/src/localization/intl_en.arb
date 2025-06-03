@@ -1,15 +1,50 @@
 {
-  "@@last_modified": "2025-06-03T10:19:25.393384",
   "@@locale": "en",
-  "helpText": "Available commands:\n/help - Show this help message\n/start - Start the bot\n/check_now - Check result now\n/language - Set language\n/add - Add new data\n/delete - Delete data\n/show - Show all data\n",
+  "helpText": "Available commands:\n/help - Show this help message\n/start - Start the bot\n/check_now - Check result now\n/language - Set language\n/add - Add new data\n/delete - Delete data\n/show - Show all data\n/delete_me - Revoke consent and delete data\n",
   "@helpText": {
     "description": "The help message listing all commands.",
     "type": "text",
     "placeholders": {}
   },
-  "startBotGreeting": "Bot started. Welcome!\nUse /help to see available commands.",
-  "@startBotGreeting": {
+  "startBotWith": "👋 Welcome to the telc certificate checker bot!\n\nFor my operation, I will collect and process some data:\n*   Your Telegram data: ID, language code – for identification and communication.\n*   Data for certificate lookup: exam attendee number, birth date, and exam date. You will enter this data yourself.\n\n📄 Found certificate information (e.g., \"B2 Beruf\") will be stored in the system. The retention period for such data is no more than 12 months.\n\n⚠️ Important!\nYou may enter data to search for another person's certificate. By providing such data, you confirm that you have all necessary permissions (e.g., consent from this person) for its processing via the bot for the specified purposes.\n\nBy clicking the \"Agree\" button, you confirm your acceptance of our Privacy Policy\n",
+  "@startBotWith": {
     "description": "Greeting message when the bot starts.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "privacyPolicyButtonText": "📄 Privacy Policy",
+  "@privacyPolicyButtonText": {
+    "description": "Text for the privacy policy button.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "agreeButtonText": "✅ Agree",
+  "@agreeButtonText": {
+    "description": "Text for the agree button.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "declineButtonText": "❌ Decline",
+  "@declineButtonText": {
+    "description": "Text for the decline button.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "consentGivenMessage": "Thank you for your consent! You can now use all bot features.",
+  "@consentGivenMessage": {
+    "description": "Message shown when user agrees to privacy policy.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "consentDeclinedMessage": "You have declined the terms. To use the bot, you need to agree to the Privacy Policy. You can restart the bot with /start to see the terms again.",
+  "@consentDeclinedMessage": {
+    "description": "Message shown when user declines privacy policy.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "mustAcceptConsentMessage": "You need to agree to the Privacy Policy before using this feature. Please use the /start command to see the terms again.",
+  "@mustAcceptConsentMessage": {
+    "description": "Message shown when a feature requires user consent but consent has not been given.",
     "type": "text",
     "placeholders": {}
   },
@@ -162,6 +197,36 @@
   "certFoundLinkText": "Certificate Link",
   "@certFoundLinkText": {
     "description": "Text for the hyperlink to the certificate.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteMeConfirmationMessage": "Are you sure you want to revoke consent and delete all your data from the system?",
+  "@deleteMeConfirmationMessage": {
+    "description": "Confirmation message for deleting all user data and revoking consent.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteMeButtonYes": "✅ Yes, delete all",
+  "@deleteMeButtonYes": {
+    "description": "Button text for confirming deletion of all user data.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteMeButtonNo": "❌ No",
+  "@deleteMeButtonNo": {
+    "description": "Button text for cancelling deletion of all user data.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteMeSuccessMessage": "Your consent has been revoked, and all your data has been successfully deleted from the system. If you wish to use the bot again, you will need to go through the consent procedure again by entering the /start command.",
+  "@deleteMeSuccessMessage": {
+    "description": "Message shown after user confirms data deletion and consent revocation.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteMeCancelledMessage": "Action cancelled. Your data remains in the system.",
+  "@deleteMeCancelledMessage": {
+    "description": "Message shown after user cancels data deletion.",
     "type": "text",
     "placeholders": {}
   }

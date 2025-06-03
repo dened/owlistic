@@ -66,5 +66,5 @@ const int defaultCountDaysForCheck = 15;
 
 final dateFormat = DateFormat('dd.MM.yyyy');
 
-const defaultLocale = 'en';
+const defaultLocale = 'de';
 const supportedLocales = ['en', 'de', 'ru', 'uk'];

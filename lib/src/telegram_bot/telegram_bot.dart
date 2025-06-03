@@ -112,7 +112,60 @@ class TelegramBot {
         headers: {'Content-Type': 'application/json'},
       ).timeout(const Duration(seconds: 12)),
     );
-    if (response.statusCode != 200) throw Exception('Failed to send message: status code ${response.statusCode}');
+    if (response.statusCode != 200)
+      switch (response.statusCode) {
+        case 403:
+          throw ForbiddenTelegramException(chatId: chatId);
+        default:
+          throw Exception('Failed to send message: status code ${response.statusCode},  body: ${response.body}');
+      }
+    final result = _jsonDecoder.convert(response.bodyBytes);
+    if (result case <String, Object?>{'ok': true, 'result': <String, Object?>{'message_id': int messageId}}) {
+      l.d(result);
+      return messageId;
+    } else if (result case <String, Object?>{'ok': false, 'description': String description}) {
+      l.w('Failed to send message: $description', StackTrace.current, result);
+      throw Exception('Failed to send message: $description');
+    } else {
+      l.w('Failed to send message', StackTrace.current, result);
+      throw Exception('Failed to send message');
+    }
+  }
+
+  /// Edit the message
+  Future<int> editMessageText(
+    int chatId,
+    int messageId,
+    String text, {
+    bool disableNotification = true,
+    bool protectContent = false,
+    bool autoEscapeMarkdown = true,
+    ParseMode parseMode = ParseMode.markdownV2,
+    Map<String, Object?>? replyMarkup,
+  }) async {
+    final url = _buildMethodUri('editMessageText');
+    final response = await retry(
+      () => _client.post(
+        url,
+        body: _jsonEncoder.convert(<String, Object?>{
+          'chat_id': chatId,
+          'message_id': messageId,
+          'text': autoEscapeMarkdown ? escapeMarkdownV2(text) : text,
+          'parse_mode': parseMode.type,
+          'disable_notification': disableNotification,
+          'protect_content': protectContent,
+          if (replyMarkup != null) 'reply_markup': replyMarkup,
+        }),
+        headers: {'Content-Type': 'application/json'},
+      ).timeout(const Duration(seconds: 12)),
+    );
+    if (response.statusCode != 200)
+      switch (response.statusCode) {
+        case 403:
+          throw ForbiddenTelegramException(chatId: chatId);
+        default:
+          throw Exception('Failed to send message: status code ${response.statusCode},  body: ${response.body}');
+      }
     final result = _jsonDecoder.convert(response.bodyBytes);
     if (result case <String, Object?>{'ok': true, 'result': <String, Object?>{'message_id': int messageId}}) {
       l.d(result);
@@ -333,4 +386,16 @@ class TelegramBot {
         .toList(growable: false)
       ..sort((a, b) => a.id.compareTo(b.id));
   }
+}
+
+/// Indicates that the bot was blocked by the user.
+/// This should be handled by removing the user from the database.
+class ForbiddenTelegramException implements Exception {
+  const ForbiddenTelegramException({required int chatId}) : _chatId = chatId;
+
+  final int _chatId;
+  int get chatId => _chatId;
+
+  @override
+  String toString() => 'Forbidden: bot was blocked by the user: $chatId';
 }

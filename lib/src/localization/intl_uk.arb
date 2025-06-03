@@ -1,14 +1,49 @@
 {
-  "@@last_modified": "2025-06-03T10:19:25.393384",
   "@@locale": "uk",
-  "helpText": "Доступні команди:\n/help - Показати це повідомлення допомоги\n/start - Запустити бота\n/check_now - Перевірити результат зараз\n/language - Встановити мову\n/add - Додати нові дані\n/delete - Видалити дані\n/show - Показати всі дані\n",
+  "privacyPolicyButtonText": "📄 Політика конфіденційності",
+  "@privacyPolicyButtonText": {
+    "description": "Text for the privacy policy button.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "agreeButtonText": "✅ Прийняти",
+  "@agreeButtonText": {
+    "description": "Text for the agree button.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "declineButtonText": "❌ Відхилити",
+  "@declineButtonText": {
+    "description": "Text for the decline button.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "consentGivenMessage": "Дякуємо за вашу згоду! Тепер ви можете використовувати всі функції бота.",
+  "@consentGivenMessage": {
+    "description": "Message shown when user agrees to privacy policy.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "consentDeclinedMessage": "Ви відхилили умови. Щоб користуватися ботом, вам потрібно погодитися з Політикою конфіденційності. Ви можете перезапустити бота за допомогою команди /start, щоб знову переглянути умови.",
+  "@consentDeclinedMessage": {
+    "description": "Message shown when user declines privacy policy.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "mustAcceptConsentMessage": "Вам потрібно погодитися з Політикою конфіденційності перед використанням цієї функції. Будь ласка, скористайтеся командою /start, щоб знову переглянути умови.",
+  "@mustAcceptConsentMessage": {
+    "description": "Message shown when a feature requires user consent but consent has not been given.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "helpText": "Доступні команди:\n/help - Показати це повідомлення допомоги\n/start - Запустити бота\n/check_now - Перевірити результат зараз\n/language - Встановити мову\n/add - Додати нові дані\n/delete - Видалити дані\n/show - Показати всі дані\n/delete_me - Відкликати згоду та видалити дані\n",
   "@helpText": {
     "description": "The help message listing all commands.",
     "type": "text",
     "placeholders": {}
   },
-  "startBotGreeting": "Бот запущено. Ласкаво просимо!\nВикористовуйте /help для перегляду доступних команд.",
-  "@startBotGreeting": {
+  "startBotWith": "👋 Ласкаво просимо до бота для перевірки сертифікатів telc!\n\nДля моєї роботи я збиратиму та оброблятиму деякі дані:\n*   Ваші дані Telegram: ID, мовний код – для ідентифікації та комунікації.\n*   Дані для пошуку сертифіката: номер учасника іспиту, дата народження та дата іспиту. Ці дані ви вводите самостійно.\n\n📄 Знайдена інформація про сертифікат (наприклад, \"B2 Beruf\") буде збережена в системі. Термін зберігання таких даних не перевищує 12 місяців.\n\n⚠️ Важливо!\nВи можете вводити дані для пошуку сертифіката іншої особи. Надаючи такі дані, ви підтверджуєте, що маєте всі необхідні дозволи (наприклад, згоду цієї особи) на їх обробку через бота у зазначених цілях.\n\nНатискаючи кнопку \"Прийняти\", ви підтверджуєте свою згоду з нашою Політикою конфіденційності\n",
+  "@startBotWith": {
     "description": "Greeting message when the bot starts.",
     "type": "text",
     "placeholders": {}
@@ -162,6 +197,36 @@
   "certFoundLinkText": "Посилання на сертифікат",
   "@certFoundLinkText": {
     "description": "Text for the hyperlink to the certificate.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteMeConfirmationMessage": "Ви дійсно бажаєте відкликати згоду та видалити всі ваші дані з системи?",
+  "@deleteMeConfirmationMessage": {
+    "description": "Confirmation message for deleting all user data and revoking consent.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteMeButtonYes": "✅ Так, видалити все",
+  "@deleteMeButtonYes": {
+    "description": "Button text for confirming deletion of all user data.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteMeButtonNo": "❌ Ні",
+  "@deleteMeButtonNo": {
+    "description": "Button text for cancelling deletion of all user data.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteMeSuccessMessage": "Вашу згоду відкликано, а всі ваші дані успішно видалено з системи. Якщо ви захочете знову скористатися ботом, вам потрібно буде пройти процедуру згоди заново, ввівши команду /start.",
+  "@deleteMeSuccessMessage": {
+    "description": "Message shown after user confirms data deletion and consent revocation.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteMeCancelledMessage": "Дію скасовано. Ваші дані залишаються в системі.",
+  "@deleteMeCancelledMessage": {
+    "description": "Message shown after user cancels data deletion.",
     "type": "text",
     "placeholders": {}
   }

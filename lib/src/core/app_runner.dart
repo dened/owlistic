@@ -25,7 +25,7 @@ Future<void> runApplication(
   l.capture<void>(
     // Run the application within a zoned guard to catch top-level errors.
     () => runZonedGuarded<void>(() async {
-      final db = Database.lazy();
+      final db = Database.lazy(path: arguments.database);
       await db.refresh();
       l.i('Database is ready');
 

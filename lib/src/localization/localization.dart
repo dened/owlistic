@@ -4,8 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:owlistic/owlistic.dart';
 import 'package:owlistic/src/localization/l10n/messages_all.dart';
 
-
-
 class Localization {
   Localization({required Database db}) : _db = db;
 
@@ -16,10 +14,9 @@ class Localization {
       await initializeMessages(locale);
     }
   }
-  
 
-  Future<T> withChatId<T>(int chatId, T Function() callback) async {
-    final languageCode = await _db.getUserLanguageCode(chatId);
+  Future<T> withChatId<T>(int chatId, T Function() callback, {String? fallbackLocale}) async {
+    final languageCode = await _db.getUserLanguageCode(chatId) ?? fallbackLocale ?? defaultLocale;
 
     return Intl.withLocale<T>(languageCode, callback) as T;
   }
@@ -38,10 +35,72 @@ class Localization {
         desc: 'The help message listing all commands.',
       );
 
-  String get startBotGreeting => Intl.message(
-        'Bot started. Welcome!\nUse /help to see available commands.',
-        name: 'startBotGreeting',
+  String get startBotWith => Intl.message(
+        '''
+👋 Welcome to the telc certificate checker bot!
+
+For my operation, I will collect and process some data:
+*   Your Telegram data: ID, language code – for identification and communication.
+*   Data for certificate lookup: exam attendee number, birth date, and exam date. You will enter this data yourself.
+
+📄 Found certificate information (e.g., "B2 Beruf") will be stored in the system. The retention period for such data is no more than 12 months.
+
+⚠️ Important!
+You may enter data to search for another person's certificate. By providing such data, you confirm that you have all necessary permissions (e.g., consent from this person) for its processing via the bot for the specified purposes.
+
+By clicking the "Agree" button, you confirm your acceptance of our Privacy Policy
+''',
+        name: 'startBotWith',
         desc: 'Greeting message when the bot starts.',
+      );
+
+  // --- Privacy Policy and Consent ---
+  String get privacyPolicyButtonText => Intl.message(
+        '📄 Privacy Policy',
+        name: 'privacyPolicyButtonText',
+        desc: 'Text for the privacy policy button.',
+      );
+
+  String get agreeButtonText => Intl.message(
+        '✅ Agree',
+        name: 'agreeButtonText',
+        desc: 'Text for the agree button.',
+      );
+
+  String get declineButtonText => Intl.message(
+        '❌ Decline',
+        name: 'declineButtonText',
+        desc: 'Text for the decline button.',
+      );
+
+  /// Keyboard for privacy policy consent.
+  /// The URL for the privacy policy should be replaced with the actual URL.
+  List<List<InlineKeyboardButton>> privacyPolicyKeyboard(String url) => [
+        [
+          InlineKeyboardButton(text: agreeButtonText, callbackData: 'consent_agree'),
+          InlineKeyboardButton(text: declineButtonText, callbackData: 'consent_decline'),
+        ],
+        [
+          InlineKeyboardButton(text: privacyPolicyButtonText, url: url),
+        ],
+      ];
+
+  String get consentGivenMessage => Intl.message(
+        'Thank you for your consent! You can now use all bot features.',
+        name: 'consentGivenMessage',
+        desc: 'Message shown when user agrees to privacy policy.',
+      );
+
+  String get consentDeclinedMessage => Intl.message(
+        'You have declined the terms. To use the bot, you need to agree to the Privacy Policy. You can restart the bot with /start to see the terms again.',
+        name: 'consentDeclinedMessage',
+        desc: 'Message shown when user declines privacy policy.',
+      );
+
+  String get mustAcceptConsentMessage => Intl.message(
+        'You need to agree to the Privacy Policy before using this feature. Please use the /start command to see the terms again.',
+        name: 'mustAcceptConsentMessage',
+        desc: 'Message shown when a feature requires user consent but consent has not been given.',
       );
 
   String get checkNowStart => Intl.message(
@@ -82,12 +141,12 @@ class Localization {
   }
 
   String languageSelectedCallback(String displayName) => Intl.message(
-      'Language selected: $displayName',
-      name: 'languageSelectedCallback',
-      args: [displayName],
-      desc: 'Confirmation message after language selection.',
-      examples: const {'displayName': 'English'},
-    );
+        'Language selected: $displayName',
+        name: 'languageSelectedCallback',
+        args: [displayName],
+        desc: 'Confirmation message after language selection.',
+        examples: const {'displayName': 'English'},
+      );
 
   List<List<InlineKeyboardButton>> get languageSelectionKeyboard => [
         [
@@ -206,4 +265,37 @@ class Localization {
         name: 'certFoundLinkText',
         desc: 'Text for the hyperlink to the certificate.',
       );
+
+  // --- Delete Me Command ---
+
+  String get deleteMeConfirmationMessage => Intl.message(
+        'Are you sure you want to revoke consent and delete all your data from the system?',
+        name: 'deleteMeConfirmationMessage',
+        desc: 'Confirmation message for deleting all user data and revoking consent.',
+      );
+
+  String get deleteMeButtonYes => Intl.message(
+        '✅ Yes, delete all',
+        name: 'deleteMeButtonYes',
+        desc: 'Button text for confirming deletion of all user data.',
+      );
+
+  String get deleteMeButtonNo => Intl.message(
+        '❌ No',
+        name: 'deleteMeButtonNo',
+        desc: 'Button text for cancelling deletion of all user data.',
+      );
+
+  String get deleteMeSuccessMessage => Intl.message(
+        'Your consent has been revoked, and all your data has been successfully deleted from the system. If you wish to use the bot again, you will need to go through the consent procedure again by entering the /start command.',
+        name: 'deleteMeSuccessMessage',
+        desc: 'Message shown after user confirms data deletion and consent revocation.',
+      );
+
+  String get deleteMeCancelledMessage => Intl.message(
+        'Action cancelled. Your data remains in the system.',
+        name: 'deleteMeCancelledMessage',
+        desc: 'Message shown after user cancels data deletion.',
+      );
+      
 }

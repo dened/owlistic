@@ -1,14 +1,16 @@
 import 'dart:io' as io;
+
 import 'package:args/args.dart';
 import 'package:l/l.dart' as logger;
 
 final class Arguments {
   Arguments._({
     required this.token,
-    required this.file,
+    required this.database,
     required this.verbose,
     required this.checkDays,
     required this.chatId,
+    required this.privacyPolicyUrl,
   });
 
   factory Arguments.parse(List<String> arguments) {
@@ -21,18 +23,20 @@ final class Arguments {
         valueHelp: '123:ABC-DEF',
       )
       ..addOption(
-        'file',
-        abbr: 'f',
-        mandatory: true,
-        help: 'Path to the file for FileStorage',
-        valueHelp: '/path/to/file',
-      )
-      ..addOption(
         'verbose',
         abbr: 'v',
         defaultsTo: 'all',
         help: 'Verbose mode for output: all | debug | info | warn | error',
         valueHelp: 'info',
+      )
+      ..addOption(
+        'db',
+        abbr: 'd',
+        aliases: ['database', 'sqlite', 'sql', 'file', 'path'],
+        mandatory: false,
+        help: 'Path to the SQLite database file',
+        defaultsTo: 'data/owliistic.db',
+        valueHelp: 'data/owliistic.db',
       )
       ..addOption(
         'chat-id',
@@ -42,17 +46,24 @@ final class Arguments {
       )
       ..addOption(
         'check-days',
-        abbr: 'd',
         help: 'How many days to check for search certificate',
         valueHelp: '15',
+      )
+      ..addOption(
+        'privacy-policy-url',
+        abbr: 'p',
+        mandatory: true,
+        help: 'Privacy Policy URL',
+        valueHelp: 'https://example.com/privacy-policy/',
       );
 
     const options = <String>{
       'token',
       'verbose',
-      'file',
+      'db',
       'chat-id',
       'check-days',
+      'privacy-policy-url',
     };
 
     try {
@@ -76,9 +87,17 @@ final class Arguments {
             option.toLowerCase(): byDefault,
       });
 
+      for (final option in parser.options.values) {
+        if (!option.mandatory) continue;
+        if (table[option.name] != null) continue;
+        io.stderr.writeln('Option "${option.name}" is required.');
+        io.exit(2);
+      }
+
       return Arguments._(
         token: table['token'] ?? '',
-        file: table['file'] ?? 'data/data.json',
+        privacyPolicyUrl: table['privacy-policy-url'] ?? '',
+        database: table['db'] ?? 'data/owliistic.db',
         verbose: switch (table['verbose']?.trim().toLowerCase()) {
           'v' || 'all' || 'verbose' => const logger.LogLevel.vvvvvv(),
           'd' || 'debug' => const logger.LogLevel.debug(),
@@ -96,11 +115,23 @@ final class Arguments {
       io.exit(64); // Exit code 64 indicates a usage error.
     }
   }
+
+  /// Telegram bot token
   final String token;
-  final String file;
+
+  /// Privacy Policy URL
+  final String privacyPolicyUrl;
+
+  /// Path to the SQLite database file
+  final String database;
+
+  /// Verbose mode for output: all | debug | info | warn | error
 
   final logger.LogLevel verbose;
 
+  /// Chat ID for manually checking results
   final int? chatId;
+
+  /// How many days to check for search certificate
   final int? checkDays;
 }

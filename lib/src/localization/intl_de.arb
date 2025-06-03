@@ -1,14 +1,49 @@
 {
-  "@@last_modified": "2025-06-03T10:19:25.393384",
   "@@locale": "de",
-  "helpText": "Verfügbare Befehle:\n/help - Diese Hilfenachricht anzeigen\n/start - Den Bot starten\n/check_now - Ergebnis jetzt prüfen\n/language - Sprache einstellen\n/add - Neue Daten hinzufügen\n/delete - Daten löschen\n/show - Alle Daten anzeigen\n",
+  "privacyPolicyButtonText": "📄 Datenschutzrichtlinie",
+  "@privacyPolicyButtonText": {
+    "description": "Text for the privacy policy button.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "agreeButtonText": "✅ Zustimmen",
+  "@agreeButtonText": {
+    "description": "Text for the agree button.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "declineButtonText": "❌ Ablehnen",
+  "@declineButtonText": {
+    "description": "Text for the decline button.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "consentGivenMessage": "Vielen Dank für Ihre Zustimmung! Sie können jetzt alle Bot-Funktionen nutzen.",
+  "@consentGivenMessage": {
+    "description": "Message shown when user agrees to privacy policy.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "consentDeclinedMessage": "Sie haben die Bedingungen abgelehnt. Um den Bot nutzen zu können, müssen Sie der Datenschutzrichtlinie zustimmen. Sie können den Bot mit /start neu starten, um die Bedingungen erneut anzuzeigen.",
+  "@consentDeclinedMessage": {
+    "description": "Message shown when user declines privacy policy.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "mustAcceptConsentMessage": "Sie müssen der Datenschutzrichtlinie zustimmen, bevor Sie diese Funktion nutzen können. Bitte verwenden Sie den Befehl /start, um die Bedingungen erneut anzuzeigen.",
+  "@mustAcceptConsentMessage": {
+    "description": "Message shown when a feature requires user consent but consent has not been given.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "helpText": "Verfügbare Befehle:\n/help - Diese Hilfenachricht anzeigen\n/start - Den Bot starten\n/check_now - Ergebnis jetzt prüfen\n/language - Sprache einstellen\n/add - Neue Daten hinzufügen\n/delete - Daten löschen\n/show - Alle Daten anzeigen\n/delete_me - Einwilligung widerrufen und Daten löschen\n",
   "@helpText": {
     "description": "The help message listing all commands.",
     "type": "text",
     "placeholders": {}
   },
-  "startBotGreeting": "Bot gestartet. Willkommen!\nNutze /help, um verfügbare Befehle zu sehen.",
-  "@startBotGreeting": {
+  "startBotWith": "👋 Willkommen beim telc Zertifikat-Checker-Bot!\n\nFür meinen Betrieb werde ich einige Daten sammeln und verarbeiten:\n*   Ihre Telegram-Daten: ID, Sprachcode – zur Identifizierung und Kommunikation.\n*   Daten für die Zertifikatssuche: Prüfungsteilnehmernummer, Geburtsdatum und Prüfungsdatum. Diese Daten geben Sie selbst ein.\n\n📄 Gefundene Zertifikatsinformationen (z.B. \"B2 Beruf\") werden im System gespeichert. Die Aufbewahrungsfrist für solche Daten beträgt nicht mehr als 12 Monate.\n\n⚠️ Wichtig!\nSie können Daten eingeben, um das Zertifikat einer anderen Person zu suchen. Indem Sie solche Daten bereitstellen, bestätigen Sie, dass Sie alle erforderlichen Berechtigungen (z.B. Zustimmung dieser Person) für deren Verarbeitung über den Bot für die angegebenen Zwecke haben.\n\nIndem Sie auf die Schaltfläche \"Zustimmen\" klicken, bestätigen Sie Ihre Annahme unserer Datenschutzrichtlinie\n",
+  "@startBotWith": {
     "description": "Greeting message when the bot starts.",
     "type": "text",
     "placeholders": {}
@@ -162,6 +197,36 @@
   "certFoundLinkText": "Zertifikat-Link",
   "@certFoundLinkText": {
     "description": "Text for the hyperlink to the certificate.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteMeConfirmationMessage": "Sind Sie sicher, dass Sie die Einwilligung widerrufen und alle Ihre Daten aus dem System löschen möchten?",
+  "@deleteMeConfirmationMessage": {
+    "description": "Confirmation message for deleting all user data and revoking consent.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteMeButtonYes": "✅ Ja, alles löschen",
+  "@deleteMeButtonYes": {
+    "description": "Button text for confirming deletion of all user data.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteMeButtonNo": "❌ Nein",
+  "@deleteMeButtonNo": {
+    "description": "Button text for cancelling deletion of all user data.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteMeSuccessMessage": "Ihre Einwilligung wurde widerrufen und alle Ihre Daten wurden erfolgreich aus dem System gelöscht. Wenn Sie den Bot erneut verwenden möchten, müssen Sie den Zustimmungsvorgang erneut durchlaufen, indem Sie den Befehl /start eingeben.",
+  "@deleteMeSuccessMessage": {
+    "description": "Message shown after user confirms data deletion and consent revocation.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteMeCancelledMessage": "Aktion abgebrochen. Ihre Daten bleiben im System.",
+  "@deleteMeCancelledMessage": {
+    "description": "Message shown after user cancels data deletion.",
     "type": "text",
     "placeholders": {}
   }

@@ -3,15 +3,13 @@ CREATE TABLE
         --req id
         id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         --req id in telegram
-        user_id INTEGER NOT NULL,
+        user_id INTEGER NOT NULL REFERENCES user(id) ON DELETE CASCADE,
         --req attendee_number
         attendee_number TEXT NOT NULL,
         --req birth_date in unix time
         birth_date INTEGER NOT NULL,
         --req exam_date in unix time
         exam_date INTEGER NOT NULL,
-        --req the data is not deleted, but is marked as deleted
-        is_deleted INTEGER NOT NULL DEFAULT 0,
         --req whether the attendee number is valid
         is_valid INTEGER NOT NULL DEFAULT 1,
         --req Created date(unixtime in seconds)

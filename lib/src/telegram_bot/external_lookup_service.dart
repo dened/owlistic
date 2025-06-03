@@ -1,13 +1,16 @@
-
 import 'dart:convert';
-import 'dart:io';
+import 'dart:io' as io;
 
 import 'package:l/l.dart';
+
 // ignore: avoid_classes_with_only_static_members
 class ExternalLookupService {
-  static Future<void> run(int chatId, {int? checkDays, bool enableDebugging = false,
-  })  async {
-    final exucutable = Platform.executable;
+  static Future<void> run(
+    int chatId, {
+    int? checkDays,
+    bool enableDebugging = false,
+  }) async {
+    final exucutable = io.Platform.executable;
     const scriptPath = 'bin/lookup_service.dart';
     final args = <String>[
       'run',
@@ -24,20 +27,22 @@ class ExternalLookupService {
       }
     ];
 
-        l.i('Starting lookup_service process with args: ${args.join(' ')}');
+    l.i('Starting lookup_service process with args: ${args.join(' ')}');
 
-    final process = await Process.start(exucutable, args);
-
-    process.stdout.transform(utf8.decoder).listen((data) {
-      // Print to console, so you can see the Observatory URI
-      // ignore: avoid_print
-      l.d('[LookupService STDOUT]: $data');
-      // l.i('[LookupService STDOUT]: $data'); // Also log it
-    });
-    process.stderr.transform(utf8.decoder).listen((data) {
-      // ignore: avoid_print
-      l.e('[LookupService STDERR]: $data');
-      // l.e('[LookupService STDERR]: $data'); // Also log it
-    });
+    await io.Process.start(
+      exucutable,
+      args,
+      runInShell: true,
+    )
+      ..stdout
+          .transform(const Utf8Decoder(allowMalformed: true))
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .listen(l.d)
+      ..stderr
+          .transform(const Utf8Decoder(allowMalformed: true))
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .listen(l.d);
   }
 }

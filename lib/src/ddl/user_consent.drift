@@ -1,0 +1,13 @@
+CREATE TABLE
+    user_consent (
+        --req id
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        --req user_id
+        user_id INTEGER NOT NULL REFERENCES user (id) ON DELETE RESTRICT,
+        --req consent_text_id
+        consent_text TEXT,
+        --req meta_created_at unixtime
+        meta_created_at INTEGER NOT NULL DEFAULT (strftime ('%s', 'now')), 
+        --revoked_at unixtime
+        revoked_at INTEGER 
+    ) STRICT;

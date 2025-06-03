@@ -35,5 +35,5 @@ The Owlistic checks the status of Telc certificates using their public API. User
 
 ### Iteration 8: GDPR / DSGVO Compliance
 - [ ] Ensure user data is stored securely and encrypted
-- [ ] Add functionality to delete user data upon request
-- [ ] Update privacy policy to reflect GDPR / DSGVO compliance
+- [x] Add functionality to delete user data upon request
+- [x] Update privacy policy to reflect GDPR / DSGVO compliance

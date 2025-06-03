@@ -2,14 +2,10 @@ CREATE TABLE
     user (
         --req id in telegram
         id INTEGER NOT NULL PRIMARY KEY,
-        -- User first_name
-        first_name TEXT,
-        -- User last_name
-        last_name TEXT,
-        -- User username
-        username TEXT,
         -- User language code
         language_code TEXT,
+        --req deleted_at(unixtime in seconds)
+        deleted_at INTEGER,
         --req Created date(unixtime in seconds)
         meta_created_at INTEGER NOT NULL DEFAULT (strftime ('%s', 'now')),
         --req Updated date(unixtime in seconds)

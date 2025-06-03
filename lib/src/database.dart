@@ -7,10 +7,11 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart' as ffi;
 import 'package:l/l.dart';
 import 'package:meta/meta.dart';
-import 'package:path/path.dart' as p;
 import 'package:owlistic/src/constant/constants.dart';
+import 'package:owlistic/src/date_utils.dart';
 import 'package:owlistic/src/dto/cetrificate_entity.dart';
 import 'package:owlistic/src/dto/search_info.dart' as m;
+import 'package:path/path.dart' as p;
 
 part 'database.g.dart';
 
@@ -44,6 +45,7 @@ abstract interface class IKeyValueStorage {
     'ddl/certification.drift',
     'ddl/search_info.drift',
     'ddl/user.drift',
+    'ddl/user_consent.drift',
   },
 )
 class Database extends _$Database
@@ -85,7 +87,7 @@ class Database extends _$Database
       if (!folder.existsSync()) await folder.create(recursive: true);
       file = File(p.join(folder.path, 'db.sqlite3'));
     } else {
-      file = File('${Directory.systemTemp.path}/drift.db');
+      file = File(path);
     }
 
     try {
@@ -100,7 +102,7 @@ class Database extends _$Database
   }
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => DatabaseMigrationStrategy(db: this);
@@ -147,6 +149,28 @@ class DatabaseMigrationStrategy implements MigrationStrategy {
     switch (from) {
       case 1:
         await m.createAll();
+        break;
+      case 2:
+
+        /// Update the table, a foreign key to the [db.searchInfo] table is added
+        await m.alterTable(TableMigration(db.certification));
+
+        /// Enable foreign key checking to delete records from [db.certification]
+        /// and delete records
+        await db.customStatement('PRAGMA foreign_keys = ON; '
+            'DELETE FROM search_info WHERE is_deleted = 1; '
+            'PRAGMA foreign_keys = OFF;');
+
+        /// update the [db.searchInfo] table
+        await m.alterTable(TableMigration(db.searchInfo));
+
+        await m.dropColumn(db.user, 'first_name');
+        await m.dropColumn(db.user, 'last_name');
+        await m.dropColumn(db.user, 'username');
+        await m.addColumn(db.user, db.user.deletedAt);
+
+        await m.createTable(db.userConsent);
+
         break;
       default:
         if (kDebugMode) throw UnimplementedError('Unknown migration from $from to $to');
@@ -264,25 +288,38 @@ mixin _DatabaseKeyValueMixin on _$Database implements IKeyValueStorage {
 
 mixin _UserInfoMixin on _$Database {
   final Map<int, String> _cacheLocale = <int, String>{};
+  final Map<int, bool> _cacheConsent = <int, bool>{};
 
   /// Saves user information into the database.
   /// If the user already exists, it will update the existing record.
   void saveUser({
     required int id,
-    String? firstName,
-    String? lastName,
-    String? username,
     String? languageCode,
   }) {
     // Implement the logic to save user data into the database
     into(user)
         .insertOnConflictUpdate(UserCompanion(
           id: Value(id),
-          firstName: Value(firstName),
-          lastName: Value(lastName),
-          username: Value(username),
           languageCode: Value(_normolizeLanguageCode(languageCode)),
         ))
+        .ignore();
+  }
+
+  /// soft remove user by chat ID.
+  void removeUserById(int chatId) {
+    /// Perform a soft delete of the user to preserve relationships in the user_consent table
+    (update(user)..where((tbl) => tbl.id.equals(chatId)))
+        .write(UserCompanion(
+          deletedAt: Value(DateTime.now().secondsSinceEpoch),
+        ))
+        .ignore();
+
+    /// search data can be completely deleted
+    (delete(searchInfo)..where((tbl) => tbl.userId.equals(chatId))).go().ignore();
+
+    // update revoked_at
+    (update(userConsent)..where((tbl) => tbl.userId.equals(chatId)))
+        .write(UserConsentCompanion(revokedAt: Value(DateTime.now().secondsSinceEpoch)))
         .ignore();
   }
 
@@ -320,25 +357,69 @@ mixin _UserInfoMixin on _$Database {
   /// Gets the language code for a given user.
   /// If the language code is not found in the cache, it retrieves it from the
   /// database and caches it for future use.
-  FutureOr<String> getUserLanguageCode(int chatId) async {
+  FutureOr<String?> getUserLanguageCode(int chatId) async {
     assert(chatId > 0, 'Chat ID must be greater than 0');
     final cachedCode = _cacheLocale[chatId];
     if (cachedCode != null) return cachedCode;
 
-    final code = await (select(user)..where((tbl) => tbl.id.equals(chatId))).map((u) => u.languageCode).getSingle();
-    _cacheLocale[chatId] = code!;
+    final code =
+        await (select(user)..where((tbl) => tbl.id.equals(chatId))).map((u) => u.languageCode).getSingleOrNull();
+    if (code != null) {
+      _cacheLocale[chatId] = code;
+    }
+
     return code;
+  }
+
+  /// Saves the user's consent to the privacy policy.
+  /// This updates the user's record with the consent text and a timestamp.
+  void saveUserConsent({required int userId, required String consentText}) {
+    // Implement the logic to save user data into the database
+    into(userConsent).insertOnConflictUpdate(UserConsentCompanion(
+      userId: Value(userId),
+      consentText: Value(consentText),
+    ));
+    _cacheConsent[userId] = true;
+  }
+
+  /// Checks if the user has given consent to the privacy policy.
+  FutureOr<bool> hasUserConsent(int chatId) async {
+    assert(chatId > 0, 'Chat ID must be greater than 0');
+    if (!_cacheConsent.containsKey(chatId)) {
+      final result = await (select(userConsent)..where((tbl) => tbl.userId.equals(chatId) & tbl.revokedAt.isNotNull()))
+          .getSingleOrNull();
+      _cacheConsent[chatId] = result != null;
+    }
+
+    return _cacheConsent[chatId]!;
   }
 }
 
 mixin _DatabaseSearchInfoMixin on _$Database {
+  void saveSearchInfo({
+    required int chatId,
+    required String attendeeNumber,
+    required DateTime birthDate,
+    required DateTime examDate,
+  }) {
+    into(searchInfo)
+        .insertOnConflictUpdate(
+          SearchInfoCompanion.insert(
+            userId: chatId,
+            attendeeNumber: attendeeNumber,
+            birthDate: birthDate.secondsSinceEpoch,
+            examDate: examDate.secondsSinceEpoch,
+          ),
+        )
+        .ignore();
+  }
+
   /// Get search info by userId ID and isRemoved == false
   /// Returns a list of [SearchInfoData] for the given chat ID.
   Future<List<m.SearchInfo>> getSearchInfo(int chatId) async {
     final query = select(searchInfo)
       ..where((tbl) =>
           tbl.userId.equals(chatId) &
-          tbl.isDeleted.equals(0) &
           notExistsQuery(select(certification)..where((cert) => cert.searchInfoId.equalsExp(tbl.id))));
 
     return query.map((s) => s.toSearchInfo()).get();
@@ -351,7 +432,6 @@ mixin _DatabaseSearchInfoMixin on _$Database {
     final query = select(searchInfo)
       ..where((tbl) =>
           tbl.isValid.equals(1) &
-          tbl.isDeleted.equals(0) &
           notExistsQuery(select(certification)..where((cert) => cert.searchInfoId.equalsExp(tbl.id))))
       ..orderBy([(u) => OrderingTerm(expression: u.userId, mode: OrderingMode.asc)]);
 
@@ -361,15 +441,13 @@ mixin _DatabaseSearchInfoMixin on _$Database {
   /// Marks all search info records for a given chat ID as deleted.
   Future<int> deleteAllSearchInfo(int chatId) {
     assert(chatId > 0, 'Chat ID must be greater than 0');
-    return (update(searchInfo)..where((tbl) => tbl.userId.equals(chatId)))
-        .write(const SearchInfoCompanion(isDeleted: Value(1)));
+    return (delete(searchInfo)..where((tbl) => tbl.userId.equals(chatId))).go();
   }
 
   /// Marks a search info record by its ID as deleted.
   Future<int> deleteSearchInfo(int id) {
     assert(id > 0, 'id must be greater than 0');
-    return (update(searchInfo)..where((tbl) => tbl.id.equals(id)))
-        .write(const SearchInfoCompanion(isDeleted: Value(1)));
+    return (delete(searchInfo)..where((tbl) => tbl.id.equals(id))).go();
   }
 
   Future<void> saveCertificate({

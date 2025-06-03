@@ -3,7 +3,7 @@ CREATE TABLE
         --req id
         id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         --req id in telegram
-        search_info_id INTEGER NOT NULL,
+        search_info_id INTEGER NOT NULL REFERENCES search_info(id) ON DELETE CASCADE,
         -- req link
         link TEXT NOT NULL,
         -- JSON data

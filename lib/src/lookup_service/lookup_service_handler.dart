@@ -48,6 +48,9 @@ final class TelegramNotificationHandler implements LookupServiceHandler {
       );
       _db.setKey(searchInfo.key, messageId);
       l.i('Saved message ID $messageId for ${searchInfo.nummer}');
+    } on ForbiddenTelegramException catch (error) {
+      _db.removeUserById(error.chatId);
+      l.e('Bot is blocked: $error');
     } on Object catch (error, stackTrace) {
       l.e('Failed to send message: $error', stackTrace);
     }
@@ -69,6 +72,9 @@ final class TelegramNotificationHandler implements LookupServiceHandler {
         link: link,
         entity: certificate,
       );
+    } on ForbiddenTelegramException catch (error) {
+      _db.removeUserById(error.chatId);
+      l.e('Bot is blocked: $error');
     } on Object catch (error, stackTrace) {
       l.e('Failed to send message: $error', stackTrace);
     }
@@ -106,9 +112,8 @@ final class TelegramNotificationHandler implements LookupServiceHandler {
       buffer.writeln('<b>$fullNameLabel</b> ${firstname.content} ${lastname.content}');
     }
 
-    final content = certificate.grades.content
-        .whereType<PointsAndTextContent>()
-        .map((c) => (c.title, '${c.points}/${c.content}'));
+    final content =
+        certificate.grades.content.whereType<PointsAndTextContent>().map((c) => (c.title, '${c.points}/${c.content}'));
 
     buffer.writeln();
     for (final (title, points) in content) {

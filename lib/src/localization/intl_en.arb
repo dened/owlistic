@@ -1,8 +1,52 @@
 {
   "@@locale": "en",
-  "helpText": "Available commands:\n/help - Show this help message\n/start - Start the bot\n/check_now - Check result now\n/language - Set language\n/add - Add new data\n/delete - Delete data\n/show - Show all data\n/delete_me - Revoke consent and delete data\n",
-  "@helpText": {
-    "description": "The help message listing all commands.",
+  "helpListHeader": "Available commands:",
+  "@helpListHeader": {
+    "description": "Header for the list of available commands in the help message.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "helpCommandDescription": "Show this help message",
+  "@helpCommandDescription": {
+    "description": "Description for the /help command.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "startCommandDescription": "Start the bot and accept the privacy policy",
+  "@startCommandDescription": {
+    "description": "Description for the /start command.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "checkNowCommandDescription": "Check for results now",
+  "@checkNowCommandDescription": {
+    "description": "Description for the /check_now command.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "languageCommandDescription": "Set your preferred language",
+  "@languageCommandDescription": {
+    "description": "Description for the /language command.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "addCommandDescription": "Add new exam search data",
+  "@addCommandDescription": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "showCommandDescription": "Show all your saved search data",
+  "@showCommandDescription": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteCommandDescription": "Delete saved search data",
+  "@deleteCommandDescription": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteMeCommandDescription": "Delete all your data and revoke consent",
+  "@deleteMeCommandDescription": {
     "type": "text",
     "placeholders": {}
   },

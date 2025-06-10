@@ -1,5 +1,55 @@
 {
   "@@locale": "ru",
+  "helpListHeader": "Доступные команды:",
+  "@helpListHeader": {
+    "description": "Header for the list of available commands in the help message.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "helpCommandDescription": "Показать это справочное сообщение",
+  "@helpCommandDescription": {
+    "description": "Description for the /help command.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "startCommandDescription": "Запустить бота и принять политику конфиденциальности",
+  "@startCommandDescription": {
+    "description": "Description for the /start command.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "checkNowCommandDescription": "Проверить результаты сейчас",
+  "@checkNowCommandDescription": {
+    "description": "Description for the /check_now command.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "languageCommandDescription": "Установить предпочитаемый язык",
+  "@languageCommandDescription": {
+    "description": "Description for the /language command.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "addCommandDescription": "Добавить новые данные для поиска экзамена",
+  "@addCommandDescription": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "showCommandDescription": "Показать все сохраненные данные поиска",
+  "@showCommandDescription": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteCommandDescription": "Удалить сохраненные данные поиска",
+  "@deleteCommandDescription": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteMeCommandDescription": "Удалить все ваши данные и отозвать согласие",
+  "@deleteMeCommandDescription": {
+    "type": "text",
+    "placeholders": {}
+  },
   "privacyPolicyButtonText": "📄 Политика конфиденциальности",
   "@privacyPolicyButtonText": {
     "description": "Text for the privacy policy button.",
@@ -33,12 +83,6 @@
   "mustAcceptConsentMessage": "Вам необходимо согласиться с Политикой конфиденциальности перед использованием этой функции. Пожалуйста, используйте команду /start, чтобы снова ознакомиться с условиями.",
   "@mustAcceptConsentMessage": {
     "description": "Message shown when a feature requires user consent but consent has not been given.",
-    "type": "text",
-    "placeholders": {}
-  },
-  "helpText": "Доступные команды:\n/help - Показать это сообщение помощи\n/start - Запустить бота\n/check_now - Проверить результат сейчас\n/language - Установить язык\n/add - Добавить новые данные\n/delete - Удалить данные\n/show - Показать все данные\n/delete_me - Отозвать согласие и удалить данные\n",
-  "@helpText": {
-    "description": "The help message listing all commands.",
     "type": "text",
     "placeholders": {}
   },

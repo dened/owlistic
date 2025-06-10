@@ -63,7 +63,7 @@ class Context {
 
     _languageCode = switch (_msg) {
       {'from': {'language_code': final String languageCode}} => languageCode,
-      _ => throw Exception('Error during parse of message: $_msg'),
+      _ => null,
     };
 
 
@@ -99,7 +99,7 @@ class Context {
   late int _chatId;
 
   /// The language code of the chat.
-  late String _languageCode;
+  String? _languageCode;
 
 
   /// The ID of the callback query, if the update is a callback query.
@@ -127,7 +127,7 @@ class Context {
   int get chatId => _chatId;
 
   /// Gets the language code of the chat. 
-  String get languageCode => _languageCode;
+  String? get languageCode => _languageCode;
 
 
   /// Gets the list of bot commands found in the message.
@@ -150,7 +150,6 @@ class Context {
 
   /// Gets the text content of the message.
   String? get text => _text;
-
 
 
   Map<String, String?>? getArgs() {

@@ -1564,19 +1564,11 @@ class MockDatabase extends _i1.Mock implements _i3.Database {
       );
 
   @override
-  _i5.FutureOr<String> getUserLanguageCode(int? chatId) => (super.noSuchMethod(
-        Invocation.method(
-          #getUserLanguageCode,
-          [chatId],
-        ),
-        returnValue: _i5.Future<String>.value(_i6.dummyValue<String>(
-          this,
-          Invocation.method(
-            #getUserLanguageCode,
-            [chatId],
-          ),
-        )),
-      ) as _i5.FutureOr<String>);
+  _i5.FutureOr<String?> getUserLanguageCode(int? chatId) =>
+      (super.noSuchMethod(Invocation.method(
+        #getUserLanguageCode,
+        [chatId],
+      )) as _i5.FutureOr<String?>);
 
   @override
   void saveUserConsent({
@@ -1900,6 +1892,51 @@ class MockLocalization extends _i1.Mock implements _i9.Localization {
       ) as String);
 
   @override
+  String get deleteMeConfirmationMessage => (super.noSuchMethod(
+        Invocation.getter(#deleteMeConfirmationMessage),
+        returnValue: _i6.dummyValue<String>(
+          this,
+          Invocation.getter(#deleteMeConfirmationMessage),
+        ),
+      ) as String);
+
+  @override
+  String get deleteMeButtonYes => (super.noSuchMethod(
+        Invocation.getter(#deleteMeButtonYes),
+        returnValue: _i6.dummyValue<String>(
+          this,
+          Invocation.getter(#deleteMeButtonYes),
+        ),
+      ) as String);
+
+  @override
+  String get deleteMeButtonNo => (super.noSuchMethod(
+        Invocation.getter(#deleteMeButtonNo),
+        returnValue: _i6.dummyValue<String>(
+          this,
+          Invocation.getter(#deleteMeButtonNo),
+        ),
+      ) as String);
+
+  @override
+  String get deleteMeSuccessMessage => (super.noSuchMethod(
+        Invocation.getter(#deleteMeSuccessMessage),
+        returnValue: _i6.dummyValue<String>(
+          this,
+          Invocation.getter(#deleteMeSuccessMessage),
+        ),
+      ) as String);
+
+  @override
+  String get deleteMeCancelledMessage => (super.noSuchMethod(
+        Invocation.getter(#deleteMeCancelledMessage),
+        returnValue: _i6.dummyValue<String>(
+          this,
+          Invocation.getter(#deleteMeCancelledMessage),
+        ),
+      ) as String);
+
+  @override
   _i5.Future<void> initializeAllMessages() => (super.noSuchMethod(
         Invocation.method(
           #initializeAllMessages,
@@ -1912,8 +1949,9 @@ class MockLocalization extends _i1.Mock implements _i9.Localization {
   @override
   _i5.Future<T> withChatId<T>(
     int? chatId,
-    T Function()? callback,
-  ) =>
+    T Function()? callback, {
+    String? fallbackLocale,
+  }) =>
       (super.noSuchMethod(
         Invocation.method(
           #withChatId,
@@ -1921,6 +1959,7 @@ class MockLocalization extends _i1.Mock implements _i9.Localization {
             chatId,
             callback,
           ],
+          {#fallbackLocale: fallbackLocale},
         ),
         returnValue: _i6.ifNotNull(
               _i6.dummyValueOrNull<T>(
@@ -1931,6 +1970,7 @@ class MockLocalization extends _i1.Mock implements _i9.Localization {
                     chatId,
                     callback,
                   ],
+                  {#fallbackLocale: fallbackLocale},
                 ),
               ),
               (T v) => _i5.Future<T>.value(v),
@@ -1943,6 +1983,7 @@ class MockLocalization extends _i1.Mock implements _i9.Localization {
                   chatId,
                   callback,
                 ],
+                {#fallbackLocale: fallbackLocale},
               ),
             ),
       ) as _i5.Future<T>);

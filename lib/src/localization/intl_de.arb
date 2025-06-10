@@ -1,5 +1,55 @@
 {
   "@@locale": "de",
+  "helpListHeader": "Verfügbare Befehle:",
+  "@helpListHeader": {
+    "description": "Header for the list of available commands in the help message.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "helpCommandDescription": "Diese Hilfenachricht anzeigen",
+  "@helpCommandDescription": {
+    "description": "Description for the /help command.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "startCommandDescription": "Den Bot starten und die Datenschutzrichtlinie akzeptieren",
+  "@startCommandDescription": {
+    "description": "Description for the /start command.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "checkNowCommandDescription": "Jetzt nach Ergebnissen suchen",
+  "@checkNowCommandDescription": {
+    "description": "Description for the /check_now command.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "languageCommandDescription": "Bevorzugte Sprache einstellen",
+  "@languageCommandDescription": {
+    "description": "Description for the /language command.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "addCommandDescription": "Neue Prüfungssuchdaten hinzufügen",
+  "@addCommandDescription": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "showCommandDescription": "Alle gespeicherten Suchdaten anzeigen",
+  "@showCommandDescription": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteCommandDescription": "Gespeicherte Suchdaten löschen",
+  "@deleteCommandDescription": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteMeCommandDescription": "Alle Ihre Daten löschen und die Einwilligung widerrufen",
+  "@deleteMeCommandDescription": {
+    "type": "text",
+    "placeholders": {}
+  },
   "privacyPolicyButtonText": "📄 Datenschutzrichtlinie",
   "@privacyPolicyButtonText": {
     "description": "Text for the privacy policy button.",
@@ -33,12 +83,6 @@
   "mustAcceptConsentMessage": "Sie müssen der Datenschutzrichtlinie zustimmen, bevor Sie diese Funktion nutzen können. Bitte verwenden Sie den Befehl /start, um die Bedingungen erneut anzuzeigen.",
   "@mustAcceptConsentMessage": {
     "description": "Message shown when a feature requires user consent but consent has not been given.",
-    "type": "text",
-    "placeholders": {}
-  },
-  "helpText": "Verfügbare Befehle:\n/help - Diese Hilfenachricht anzeigen\n/start - Den Bot starten\n/check_now - Ergebnis jetzt prüfen\n/language - Sprache einstellen\n/add - Neue Daten hinzufügen\n/delete - Daten löschen\n/show - Alle Daten anzeigen\n/delete_me - Einwilligung widerrufen und Daten löschen\n",
-  "@helpText": {
-    "description": "The help message listing all commands.",
     "type": "text",
     "placeholders": {}
   },

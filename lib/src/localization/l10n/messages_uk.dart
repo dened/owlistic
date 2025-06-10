@@ -57,7 +57,6 @@ class MessageLookup extends MessageLookupByLibrary {
     'deleteNoData': MessageLookupByLibrary.simpleMessage('Дані ще не додано. Немає чого видаляти.'),
     'deleteOneSuccessCallback': MessageLookupByLibrary.simpleMessage('Запис успішно видалено.'),
     'deleteSelectPrompt': MessageLookupByLibrary.simpleMessage('Виберіть запис для видалення або натисніть \"Видалити все\", щоб видалити всі записи.'),
-    'helpText': MessageLookupByLibrary.simpleMessage('Доступні команди:\n/help - Показати це повідомлення допомоги\n/start - Запустити бота\n/check_now - Перевірити результат зараз\n/language - Встановити мову\n/add - Додати нові дані\n/delete - Видалити дані\n/show - Показати всі дані\n/delete_me - Відкликати згоду та видалити дані\n'),
     'langEnglish': MessageLookupByLibrary.simpleMessage('Англійська'),
     'langGerman': MessageLookupByLibrary.simpleMessage('Німецька'),
     'langRussian': MessageLookupByLibrary.simpleMessage('Російська'),

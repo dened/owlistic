@@ -22,19 +22,47 @@ class Localization {
   }
 
   // --- General ---
-  String get helpText => Intl.message(
-        'Available commands:\n'
-        '/help - Show this help message\n'
-        '/start - Start the bot\n'
-        '/check_now - Check result now\n'
-        '/language - Set language\n'
-        '/add - Add new data\n'
-        '/delete - Delete data\n'
-        '/show - Show all data\n',
-        name: 'helpText',
-        desc: 'The help message listing all commands.',
+  String get helpListHeader => Intl.message(
+        'Available commands:',
+        name: 'helpListHeader',
+        desc: 'Header for the list of available commands in the help message.',
       );
 
+  String get helpCommandDescription => Intl.message(
+        'Show this help message',
+        name: 'helpCommandDescription',
+        desc: 'Description for the /help command.',
+      );
+
+  String get startCommandDescription => Intl.message(
+        'Start the bot and accept the privacy policy',
+        name: 'startCommandDescription',
+        desc: 'Description for the /start command.',
+      );
+
+  String get checkNowCommandDescription => Intl.message(
+        'Check for results now',
+        name: 'checkNowCommandDescription',
+        desc: 'Description for the /check_now command.',
+      );
+
+  String get languageCommandDescription => Intl.message(
+        'Set your preferred language',
+        name: 'languageCommandDescription',
+        desc: 'Description for the /language command.',
+      );
+
+  // Note: Descriptions for /add, /show, /delete, /delete_me are already present
+  // as part of the addSuccess, showNoData, deleteNoData, deleteMeSuccessMessage, etc.
+  // We might need dedicated, shorter descriptions for the help list.
+  // Let's add them now.
+
+  String get addCommandDescription => Intl.message('Add new exam search data', name: 'addCommandDescription');
+  String get showCommandDescription => Intl.message('Show all your saved search data', name: 'showCommandDescription');
+  String get deleteCommandDescription => Intl.message('Delete saved search data', name: 'deleteCommandDescription');
+  String get deleteMeCommandDescription => Intl.message('Delete all your data and revoke consent', name: 'deleteMeCommandDescription');
+
+  // --- Privacy Policy and Consent ---
   String get startBotWith => Intl.message(
         '''
 👋 Welcome to the telc certificate checker bot!
@@ -198,6 +226,7 @@ By clicking the "Agree" button, you confirm your acceptance of our Privacy Polic
         'Information added successfully!\n'
         'You can view the list of added entries with /show or add a new one with /add.\n'
         'To delete data, use the /delete command.',
+        // This is a success message, not a command description.
         name: 'addSuccess',
       );
   // --- Show Command ---
@@ -205,6 +234,7 @@ By clicking the "Agree" button, you confirm your acceptance of our Privacy Polic
         'No data added yet. Use /add to add new entries.',
         name: 'showNoData',
       );
+  // This is a message when no data is found, not a command description.
 
   String get showListHeader => Intl.message(
         'List of added entries:\n',
@@ -220,6 +250,7 @@ By clicking the "Agree" button, you confirm your acceptance of our Privacy Polic
   String get deleteNoData => Intl.message(
         'No data added yet. Nothing to delete.',
         name: 'deleteNoData',
+        // This is a message when no data is found, not a command description.
       );
 
   String get deleteButtonDeleteAll => Intl.message(
@@ -289,6 +320,7 @@ By clicking the "Agree" button, you confirm your acceptance of our Privacy Polic
   String get deleteMeSuccessMessage => Intl.message(
         'Your consent has been revoked, and all your data has been successfully deleted from the system. If you wish to use the bot again, you will need to go through the consent procedure again by entering the /start command.',
         name: 'deleteMeSuccessMessage',
+        // This is a success message, not a command description.
         desc: 'Message shown after user confirms data deletion and consent revocation.',
       );
 
@@ -297,5 +329,4 @@ By clicking the "Agree" button, you confirm your acceptance of our Privacy Polic
         name: 'deleteMeCancelledMessage',
         desc: 'Message shown after user cancels data deletion.',
       );
-      
 }

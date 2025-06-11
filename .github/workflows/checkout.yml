@@ -93,8 +93,7 @@ jobs:
           dart pub global run coverage:test_with_coverage -fb -o coverage -- \
             --platform=vm --compiler=kernel --coverage=coverage \
             --reporter=github --file-reporter=json:reports/tests.json \
-            --timeout=10m --concurrency=12 --color \
-              test/unit_test.dart
+            --timeout=10m --concurrency=12 --color test
 
       - name: 🎁 Setup LCOV
         timeout-minutes: 5

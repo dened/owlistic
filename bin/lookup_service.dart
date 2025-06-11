@@ -1,8 +1,6 @@
 import 'dart:async';
 
 import 'package:owlistic/owlistic.dart';
-import 'package:owlistic/src/core/app_runner.dart';
-import 'package:owlistic/src/lookup_service/lookup_service_handler.dart';
 
 Future<void> main(List<String> args) async {
   await runApplication(args, (dependecies) async {

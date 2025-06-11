@@ -2,15 +2,6 @@ import 'dart:async';
 
 import 'package:l/l.dart';
 import 'package:owlistic/owlistic.dart';
-import 'package:owlistic/src/core/app_runner.dart';
-import 'package:owlistic/src/core/dependencies.dart';
-import 'package:owlistic/src/telegram_bot/base_handler.dart';
-import 'package:owlistic/src/telegram_bot/command_handler.dart';
-import 'package:owlistic/src/telegram_bot/command_proccessor.dart';
-import 'package:owlistic/src/telegram_bot/conversation_handler.dart';
-import 'package:owlistic/src/telegram_bot/conversation_state.dart';
-import 'package:owlistic/src/telegram_bot/external_lookup_service.dart';
-import 'package:owlistic/src/telegram_bot/guard.dart';
 
 /// Runs the Telegram bot.
 ///
@@ -72,12 +63,12 @@ void Function(int updateId, Map<String, Object?> update) handler({
           );
           ctx.db.saveUserConsent(
             userId: ctx.chatId,
-            consentText: ln.startBotWith, // Полный текст, на который дано согласие
+            consentText: ln.startBotWith, 
           );
-          await ctx.bot.answerCallbackQuery(ctx.callbackId, ''); // Убираем "часики" с кнопки
+          await ctx.bot.answerCallbackQuery(ctx.callbackId, ''); 
           await ctx.bot.editMessageText(ctx.chatId, ctx.messageId, ln.consentGivenMessage);
         } else if (callbackData == 'consent_decline') {
-          await ctx.bot.answerCallbackQuery(ctx.callbackId, ''); // Убираем "часики" с кнопки
+          await ctx.bot.answerCallbackQuery(ctx.callbackId, ''); 
           await ctx.bot.editMessageText(ctx.chatId, ctx.messageId, ln.consentDeclinedMessage);
         }
 
@@ -152,7 +143,6 @@ void Function(int updateId, Map<String, Object?> update) handler({
             return const NextStep(AddConversationStep.number);
           },
           AddConversationStep.birthDate: (ctx, state) async {
-            // state теперь типа AddState
             final birthDate = ctx.text ?? '';
             // Validate the entered birth date format.
             if (dateFormat.tryParse(birthDate) == null) {

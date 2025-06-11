@@ -29,7 +29,7 @@ dependencies:
 
 dev_dependencies:
   # Linting
-  lints: ^5.1.1
+  lints: ">=5.1.1 <7.0.0"
 
   # Testing
   test: any

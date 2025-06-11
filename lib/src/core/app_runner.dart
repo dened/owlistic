@@ -5,8 +5,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:l/l.dart';
 import 'package:owlistic/owlistic.dart';
-import 'package:owlistic/src/core/dependencies.dart';
-import 'package:owlistic/src/localization/localization.dart';
+
 
 /// An abstraction for running an application with common initialization.
 ///

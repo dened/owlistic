@@ -8,6 +8,13 @@
 # Data
 data/
 
+# Test
+.coverage/
+/test/**/*.json
+/test/.test_coverage.dart
+/reports
+/coverage
+
 # Database
 *.sqlite
 *.sqlite3

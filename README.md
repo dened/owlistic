@@ -100,7 +100,7 @@ The application's `Arguments` class determines how environment variables are loa
 | `-d`, `--db`             | `DB_PATH`                             | Path to the SQLite database file.                                                                          | `data/owlistic.db`     | Both            |
 | `-v`, `--verbose`        | `VERBOSE_LEVEL`                       | Logging verbosity. Options: `all`, `debug`, `info`, `warn`, `error`.                                       | `info`                 | Both            |
 | `-c`, `--chat-id`        | `CHAT_ID`                             | (Integer) Specific chat ID to check. If not provided, `lookup_service` checks all eligible users.          | —                      | `lookup_service`|
-| `--check-days`           | `CHECK_DAYS`                          | (Integer) Number of days before and after the registered exam date to search for certificates.             | `10`                   | `lookup_service`|
+| `--check-days`           | `CHECK_DAYS`                          | (Integer) How many days to check from today and back.                                                      | `10`                   | `lookup_service`|
 | `--help`                 |                                       | Show help message detailing all options and exit.                                                          |                        | Both            |
 
 To see all available command-line options for each script, run:
@@ -125,12 +125,10 @@ The bot supports the following commands:
 ## 🏗️ Building
 
 ### 🛠️ How to Compile
-
-1.  Ensure dependencies are installed and code is generated (see Install Dependencies).
-2.  Compile the executables:
-    ```sh
-    dart compile exe bin/owlistic.dart -o owlistic.run
-    dart compile exe bin/lookup_service.dart -o lookup_service.run
-    ```
-    This will create `owlistic` and `lookup_service` (or `*.exe` on Windows) in the project root.
+```sh
+dart pub get
+dart run build_runner build --delete-conflicting-outputs
+dart compile exe bin/owlistic.dart -o owlistic.run
+dart compile exe bin/lookup_service.dart -o lookup_service.run
+```
 

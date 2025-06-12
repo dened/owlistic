@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'cetrificate_entity.g.dart';
+part 'certificate_entity.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class CertificateEntity {

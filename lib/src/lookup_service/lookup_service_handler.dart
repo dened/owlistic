@@ -1,6 +1,6 @@
 import 'package:l/l.dart';
 import 'package:owlistic/src/database.dart' show Database;
-import 'package:owlistic/src/dto/cetrificate_entity.dart';
+import 'package:owlistic/src/dto/certificate_entity.dart';
 import 'package:owlistic/src/dto/search_info.dart';
 import 'package:owlistic/src/localization/localization.dart';
 import 'package:owlistic/src/telegram_bot/telegram_bot.dart';

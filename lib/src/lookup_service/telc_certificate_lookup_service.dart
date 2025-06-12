@@ -22,9 +22,9 @@ final class TelcCertificateLookupService {
     required TelcApiClient apiClient,
     required Database db,
     required LookupServiceHandler handler,
-  })  : _apiClient = apiClient,
-        _db = db,
-        _handler = handler;
+  }) : _apiClient = apiClient,
+       _db = db,
+       _handler = handler;
 
   final TelcApiClient _apiClient;
   final Database _db;
@@ -60,9 +60,8 @@ final class TelcCertificateLookupService {
   /// The [daysForCheck] parameter specifies the number of days around the exam date to check.
   Future<void> _checkSearchInfoList(List<SearchInfo> allSearchTasks, int daysForCheck) async {
     l.i('Checking ${allSearchTasks.length} search tasks for certificates...');
-    for (var i = 0; i < allSearchTasks.length; i += batchSize) {
-      final batch = allSearchTasks.skip(i).take(batchSize);
-      await Future.wait(batch.map((info) async {
+    await Future.wait(
+      allSearchTasks.map((info) async {
         try {
           final (examinationInstituteId, examId, attendeeId) = await _lookupCert(
             info.nummer,
@@ -72,11 +71,9 @@ final class TelcCertificateLookupService {
 
           /// Make several attempts to fetch certificate data, as the data should definitely exist.
           /// The error might be related to a temporary failure on the API side.
-          final certificate = await retry(() => _apiClient.fetchCertificateData(
-                examinationInstituteId,
-                examId,
-                attendeeId,
-              ));
+          final certificate = await retry(
+            () => _apiClient.fetchCertificateData(examinationInstituteId, examId, attendeeId),
+          );
 
           _handler
               .certFound(
@@ -92,12 +89,9 @@ final class TelcCertificateLookupService {
         } on Object catch (error, stackTrace) {
           l.e('An error occurred while checking certificates: $error', stackTrace);
         }
-      }));
-      // Add delay between batches except after the last batch
-      if (i + batchSize < allSearchTasks.length) {
-        await Future<void>.delayed(batchDelay);
-      }
-    }
+      }),
+    );
+
     l.i('All search tasks have been processed.');
   }
 

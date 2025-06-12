@@ -3,6 +3,7 @@ import 'dart:io' as io;
 
 import 'package:l/l.dart';
 import 'package:owlistic/owlistic.dart';
+import 'package:owlistic/src/telegram_bot/context.dart';
 
 /// Runs the Telegram bot.
 ///
@@ -21,7 +22,7 @@ Future<void> main(List<String> args) async {
       await dependencies.db.customStatement('VACUUM;'); // Compact the database every five days
       l.i('Database "${dependencies.arguments.database}" is compacted');
     });
-// Initialize the Telegram bot and register the main update handler.
+    // Initialize the Telegram bot and register the main update handler.
     dependencies.bot
       ..addHandler(handler(dp: dependencies))
       ..start();
@@ -69,62 +70,61 @@ Future<T?> shutdownHandler<T extends Object?>([final Future<T> Function()? onShu
 /// It also ensures that each update is processed within the correct localization context.
 ///
 /// Returns a function that will be called by the Telegram bot library for each incoming update.
-void Function(int updateId, Map<String, Object?> update) handler({
-  required Dependencies dp,
-}) {
+void Function(int updateId, Map<String, Object?> update) handler({required Dependencies dp}) {
   final bot = dp.bot;
   final db = dp.db;
   final ln = dp.ln;
 
-  final commandProcessor = CommandProcessor(
-    bot: bot,
-    db: db,
-    ln: ln,
-  );
+  final commandProcessor = CommandProcessor(bot: bot, db: db, ln: ln);
   // Handler for the /help command.
   // ignore: avoid_single_cascade_in_expression_statements
   commandProcessor
-    ..addHandler(CommandHandler('/help', (ln) => ln.helpCommandDescription, (ctx) async {
-      final helpMessage = StringBuffer()..writeln(ctx.ln.helpListHeader);
-      for (final handler in commandProcessor.handlers) {
-        if (handler is CommandHandlerMixin) {
-          helpMessage.writeln('${handler.command} - ${handler.description(ctx.ln)}');
+    ..addHandler(
+      CommandHandler('/help', (ln) => ln.helpCommandDescription, (ctx) async {
+        final helpMessage = StringBuffer()..writeln(ctx.ln.helpListHeader);
+        for (final handler in commandProcessor.handlers) {
+          if (handler is CommandHandlerMixin) {
+            helpMessage.writeln('${handler.command} - ${handler.description(ctx.ln)}');
+          }
         }
-      }
-      await ctx.bot.sendMessage(ctx.chatId, helpMessage.toString());
-    }))
+        await ctx.bot.sendMessage(ctx.chatId, helpMessage.toString());
+      }),
+    )
     // Handler for the /start command.
     ..addHandler(
-        ConversationHandler.emptyState<OneStep>('/start', (ln) => ln.startCommandDescription, (ctx, state) async {
-      // Send the language selection prompt with an inline keyboard.
-      await ctx.bot
-          .sendInlineKeyboard(ctx.chatId, ln.startBotWith, ln.privacyPolicyKeyboard(dp.arguments.privacyPolicyUrl));
-      return const NextStep(OneStep.go);
-    }, steps: {
-      // Process the user's language selection from the callback query.
-      OneStep.go: (ctx, state) async {
-        final callbackData = ctx.callbackData;
-
-        if (callbackData == 'consent_agree') {
-          // Initialize the Telegram bot and register the main update handler.
-          ctx.db.saveUser(
-            id: ctx.chatId,
-            languageCode: ctx.languageCode,
+      ConversationHandler.emptyState<OneStep>(
+        '/start',
+        (ln) => ln.startCommandDescription,
+        (ctx, state) async {
+          // Send the language selection prompt with an inline keyboard.
+          await ctx.bot.sendInlineKeyboard(
+            ctx.chatId,
+            ln.startBotWith,
+            ln.privacyPolicyKeyboard(dp.arguments.privacyPolicyUrl),
           );
-          ctx.db.saveUserConsent(
-            userId: ctx.chatId,
-            consentText: ln.startBotWith,
-          );
-          await ctx.bot.answerCallbackQuery(ctx.callbackId, '');
-          await ctx.bot.editMessageText(ctx.chatId, ctx.messageId, ln.consentGivenMessage);
-        } else if (callbackData == 'consent_decline') {
-          await ctx.bot.answerCallbackQuery(ctx.callbackId, '');
-          await ctx.bot.editMessageText(ctx.chatId, ctx.messageId, ln.consentDeclinedMessage);
-        }
+          return const NextStep(OneStep.go);
+        },
+        steps: {
+          // Process the user's language selection from the callback query.
+          OneStep.go: (ctx, state) async {
+            final callbackData = ctx.callbackData;
 
-        return const Done();
-      },
-    }))
+            if (callbackData == 'consent_agree') {
+              // Initialize the Telegram bot and register the main update handler.
+              ctx.db.saveUser(id: ctx.chatId, languageCode: ctx.languageCode);
+              ctx.db.saveUserConsent(userId: ctx.chatId, consentText: ln.startBotWith);
+              await ctx.bot.answerCallbackQuery(ctx.callbackId, '');
+              await ctx.bot.editMessageText(ctx.chatId, ctx.messageId, ln.consentGivenMessage);
+            } else if (callbackData == 'consent_decline') {
+              await ctx.bot.answerCallbackQuery(ctx.callbackId, '');
+              await ctx.bot.editMessageText(ctx.chatId, ctx.messageId, ln.consentDeclinedMessage);
+            }
+
+            return const Done();
+          },
+        },
+      ),
+    )
     // Handler for the /check_now command.
     ..addHandler(
       CommandHandler('/check_now', (ln) => ln.checkNowCommandDescription, (ctx) async {
@@ -134,56 +134,67 @@ void Function(int updateId, Map<String, Object?> update) handler({
         await ExternalLookupService.run(ctx.chatId, checkDays: checkDays);
         // Delete the "Starting results check..." message after a delay.
         Future.delayed(const Duration(seconds: 5), () => ctx.bot.deleteMessage(ctx.chatId, messageId));
-      }, guards: [
-        ConsentGuard(),
-      ]),
+      }, guards: [ConsentGuard()]),
     )
     // Conversation handler for the /language command.
     ..addHandler(
-        ConversationHandler.emptyState<OneStep>('/language', (ln) => ln.languageCommandDescription, (ctx, state) async {
-      // Send the language selection prompt with an inline keyboard.
-      await ctx.bot.sendInlineKeyboard(ctx.chatId, ln.languageSelectPompt, ln.languageSelectionKeyboard);
-      return const NextStep(OneStep.go);
-    }, steps: {
-      // Step 0: Process the user's language selection from the callback query.
-      OneStep.go: (ctx, state) async {
-        final languageCode = ctx.callbackData;
-        if (languageCode == null || languageCode.isEmpty) {
-          l.w('Callback data for language selection is empty or null.');
-          return const Done();
-        }
-
-        ctx.db.saveUserLanguageCode(ctx.chatId, languageCode);
-
-        /// Since the user's language code has just been saved,
-        /// we use `ln.withChatId` to ensure the callback message is localized correctly in the user's selected language.
-        final languageSelectedCallback = await ln.withChatId(ctx.chatId, () {
-          final displayName = ln.getDisplayNameForLanguageCode(languageCode);
-          return ln.languageSelectedCallback(displayName);
-        });
-        await ctx.bot.answerCallbackQuery(ctx.callbackId, languageSelectedCallback);
-        await ctx.bot.deleteMessage(ctx.chatId, ctx.messageId);
-        return const Done();
-      },
-    }, guards: [
-      ConsentGuard(),
-    ]))
-    // Conversation handler for the /add command (to add exam search info).
-    ..addHandler(ConversationHandler<AddConversationStep, AddState>('/add', (ln) => ln.addCommandDescription,
+      ConversationHandler.emptyState<OneStep>(
+        '/language',
+        (ln) => ln.languageCommandDescription,
         (ctx, state) async {
-      await ctx.bot.sendMessage(ctx.chatId, ln.addPromptAttendeeNumber);
-      return const NextStep(AddConversationStep.number);
-    },
+          // Send the language selection prompt with an inline keyboard.
+          await ctx.bot.sendInlineKeyboard(ctx.chatId, ln.languageSelectPompt, ln.languageSelectionKeyboard);
+          return const NextStep(OneStep.go);
+        },
+        steps: {
+          // Step 0: Process the user's language selection from the callback query.
+          OneStep.go: (ctx, state) async {
+            final languageCode = ctx.callbackData;
+            if (languageCode == null || languageCode.isEmpty) {
+              l.w('Callback data for language selection is empty or null.');
+              return const Done();
+            }
+
+            ctx.db.saveUserLanguageCode(ctx.chatId, languageCode);
+
+            /// Since the user's language code has just been saved,
+            /// we use `ln.withChatId` to ensure the callback message is localized correctly in the user's selected language.
+            final languageSelectedCallback = await ln.withChatId(ctx.chatId, () {
+              final displayName = ln.getDisplayNameForLanguageCode(languageCode);
+              return ln.languageSelectedCallback(displayName);
+            });
+            await ctx.bot.answerCallbackQuery(ctx.callbackId, languageSelectedCallback);
+            await ctx.bot.deleteMessage(ctx.chatId, ctx.messageId);
+            return const Done();
+          },
+        },
+        guards: [ConsentGuard()],
+      ),
+    )
+    // Conversation handler for the /add command (to add exam search info).
+    ..addHandler(
+      ConversationHandler<AddConversationStep, AddState>(
+        '/add',
+        (ln) => ln.addCommandDescription,
+        (ctx, state) async {
+          // If the user provided an argument in the /add command,
+          // try to parse it into an AddState object.
+          final addState = AddState.tryParse(ctx.getArgs()?['/add']);
+
+          if (addState != null) {
+            await _saveAndNotifySuccess(ctx, ln, addState.number!, addState.birthDate!, addState.examDate!);
+            return const Done();
+          }
+
+          await ctx.bot.sendMessage(ctx.chatId, ln.addPromptAttendeeNumber);
+          return const NextStep(AddConversationStep.number);
+        },
         stateBuilder: AddState.new,
         steps: <AddConversationStep, ConversationStepCallback<AddConversationStep, AddState>>{
           AddConversationStep.number: (ctx, state) async {
             // Validate the entered attendee number.
             final number = ctx.text ?? '';
-            if ([
-              RegExp(r'^\d{7}$').hasMatch(number),
-              number == '000',
-              number == state.number,
-            ].any((element) => element)) {
+            if ([AddState.validateNumber(number), number == state.number].any((element) => element)) {
               state.number = number;
               // If valid, prompt for the birth date.
               await ctx.bot.sendMessage(ctx.chatId, ln.addPromptBirthDate);
@@ -197,7 +208,7 @@ void Function(int updateId, Map<String, Object?> update) handler({
           AddConversationStep.birthDate: (ctx, state) async {
             final birthDate = ctx.text ?? '';
             // Validate the entered birth date format.
-            if (dateFormat.tryParse(birthDate) == null) {
+            if (!AddState.validateBirthDate(birthDate)) {
               await ctx.bot.sendMessage(ctx.chatId, ln.addInvalidBirthDate);
               return const NextStep(AddConversationStep.birthDate);
             }
@@ -210,132 +221,128 @@ void Function(int updateId, Map<String, Object?> update) handler({
             final birthDate = state.birthDate;
             final examDate = ctx.text ?? '';
             // Validate the entered exam date format.
-            if (dateFormat.tryParse(examDate) == null) {
+            if (!AddState.validateExamDate(examDate)) {
               await ctx.bot.sendMessage(ctx.chatId, ln.addInvalidExamDate(dateFormat.pattern!));
               return const NextStep(AddConversationStep.examDate);
             }
 
-            // Save the collected information to the database.
-            ctx.db.saveSearchInfo(
-              chatId: ctx.chatId,
-              attendeeNumber: number!,
-              birthDate: dateFormat.parse(birthDate!),
-              examDate: dateFormat.parse(examDate),
-            );
-
-            // Send a success message.
-            await ctx.bot.sendMessage(ctx.chatId, ln.addSuccess);
+            // Handle saving and success message using the helper function.
+            await _saveAndNotifySuccess(ctx, ln, number!, birthDate!, examDate);
             return const Done();
           },
         },
-        guards: [
-          ConsentGuard(),
-        ]))
+        guards: [ConsentGuard()],
+      ),
+    )
     // Handler for the /show command.
-    ..addHandler(CommandHandler('/show', (ln) => ln.showCommandDescription, (ctx) async {
-      final searchInfoList = await ctx.db.getSearchInfo(ctx.chatId);
-      if (searchInfoList.isEmpty) {
-        // If no data, send a corresponding message.
-        await ctx.bot.sendMessage(ctx.chatId, ln.showNoData);
-        return;
-      }
-      // Format and send the list of search entries.
-      final message = StringBuffer(ln.showListHeader);
-      for (final searchInfo in searchInfoList) {
-        message.writeln(
-          '${searchInfo.nummer} - ${dateFormat.format(searchInfo.birthDate)}. '
-          '${ln.showExamDatePrefix} ${dateFormat.format(searchInfo.examDate)}',
-        );
-      }
-      await ctx.bot.sendMessage(
-        ctx.chatId,
-        message.toString(),
-      );
-    }, guards: [
-      ConsentGuard(),
-    ]))
+    ..addHandler(
+      CommandHandler('/show', (ln) => ln.showCommandDescription, (ctx) async {
+        final searchInfoList = await ctx.db.getSearchInfo(ctx.chatId);
+        if (searchInfoList.isEmpty) {
+          // If no data, send a corresponding message.
+          await ctx.bot.sendMessage(ctx.chatId, ln.showNoData);
+          return;
+        }
+        // Format and send the list of search entries.
+        final message = StringBuffer(ln.showListHeader);
+        for (final searchInfo in searchInfoList) {
+          message.writeln(
+            '${searchInfo.nummer} - ${dateFormat.format(searchInfo.birthDate)}. '
+            '${ln.showExamDatePrefix} ${dateFormat.format(searchInfo.examDate)}',
+          );
+        }
+        await ctx.bot.sendMessage(ctx.chatId, message.toString());
+      }, guards: [ConsentGuard()]),
+    )
     // Conversation handler for the /delete command.
     ..addHandler(
-        ConversationHandler.emptyState<OneStep>('/delete', (ln) => ln.deleteCommandDescription, (ctx, state) async {
-      final searchInfoList = await ctx.db.getSearchInfo(ctx.chatId);
-      if (searchInfoList.isEmpty) {
-        // If no data, send a message and finish.
-        await ctx.bot.sendMessage(ctx.chatId, ln.deleteNoData);
-        return const Done();
-      }
-
-      const rowLength = 5;
-      // Create an inline keyboard with buttons for each entry and a "Delete All" button.
-      final inlineKeyboard = <List<InlineKeyboardButton>>[];
-      for (var i = 0; i < searchInfoList.length; i += rowLength) {
-        final row = searchInfoList
-            .skip(i)
-            .take(rowLength)
-            .map((searchInfo) => InlineKeyboardButton(
-                  text: '[${searchInfo.nummer}]',
-                  callbackData: '${searchInfo.id}',
-                ))
-            .toList();
-        inlineKeyboard.add(row);
-      }
-
-      inlineKeyboard.add([
-        InlineKeyboardButton(
-          text: ln.deleteButtonDeleteAll,
-          callbackData: 'all',
-        )
-      ]);
-
-      await ctx.bot.sendInlineKeyboard(ctx.chatId, ln.deleteSelectPrompt, inlineKeyboard);
-
-      return const NextStep(OneStep.go);
-    }, steps: {
-      // Step for processing the deletion choice.
-      OneStep.go: (ctx, state) async {
-        final value = ctx.callbackData ?? '';
-
-        if (value == 'all') {
-          // If "Delete All" is selected.
-          await ctx.db.deleteAllSearchInfo(ctx.chatId);
-          await ctx.bot.answerCallbackQuery(ctx.callbackId, ln.deleteAllSuccessCallback);
-          await ctx.bot.deleteMessage(ctx.chatId, ctx.messageId);
-          return const Done();
-        }
-        // If a specific entry is selected for deletion.
-        final index = int.parse(value);
-        await ctx.db.deleteSearchInfo(index);
-        await ctx.bot.answerCallbackQuery(ctx.callbackId, ln.deleteOneSuccessCallback);
-        await ctx.bot.deleteMessage(ctx.chatId, ctx.messageId);
-        return const Done();
-      },
-    }, guards: [
-      ConsentGuard(),
-    ]))
-    ..addHandler(ConversationHandler.emptyState<OneStep>('/delete_me', (ln) => ln.deleteMeCommandDescription,
+      ConversationHandler.emptyState<OneStep>(
+        '/delete',
+        (ln) => ln.deleteCommandDescription,
         (ctx, state) async {
-      final keyboard = <List<InlineKeyboardButton>>[
-        [InlineKeyboardButton(text: ln.deleteMeButtonYes, callbackData: 'delete_me_confirm_yes')],
-        [InlineKeyboardButton(text: ln.deleteMeButtonNo, callbackData: 'delete_me_confirm_no')]
-      ];
+          final searchInfoList = await ctx.db.getSearchInfo(ctx.chatId);
+          if (searchInfoList.isEmpty) {
+            // If no data, send a message and finish.
+            await ctx.bot.sendMessage(ctx.chatId, ln.deleteNoData);
+            return const Done();
+          }
 
-      await ctx.bot.sendInlineKeyboard(ctx.chatId, ln.deleteMeConfirmationMessage, keyboard);
+          const rowLength = 5;
+          // Create an inline keyboard with buttons for each entry and a "Delete All" button.
+          final inlineKeyboard = <List<InlineKeyboardButton>>[];
+          for (var i = 0; i < searchInfoList.length; i += rowLength) {
+            final row =
+                searchInfoList
+                    .skip(i)
+                    .take(rowLength)
+                    .map(
+                      (searchInfo) =>
+                          InlineKeyboardButton(text: '[${searchInfo.nummer}]', callbackData: '${searchInfo.id}'),
+                    )
+                    .toList();
+            inlineKeyboard.add(row);
+          }
 
-      return const NextStep(OneStep.go);
-    }, steps: {
-      // Step for processing the deletion choice.
-      OneStep.go: (ctx, state) async {
-        final value = ctx.callbackData ?? '';
-        await ctx.bot.answerCallbackQuery(ctx.callbackId, '');
-        if (value == 'delete_me_confirm_yes') {
-          ctx.db.removeUserById(ctx.chatId);
-          await ctx.bot.editMessageText(ctx.chatId, ctx.messageId, ln.deleteMeSuccessMessage);
-          return const Done();
-        }
+          inlineKeyboard.add([InlineKeyboardButton(text: ln.deleteButtonDeleteAll, callbackData: 'all')]);
 
-        await ctx.bot.editMessageText(ctx.chatId, ctx.messageId, ln.deleteMeCancelledMessage);
-        return const Done();
-      },
-    }));
+          await ctx.bot.sendInlineKeyboard(ctx.chatId, ln.deleteSelectPrompt, inlineKeyboard);
+
+          return const NextStep(OneStep.go);
+        },
+        steps: {
+          // Step for processing the deletion choice.
+          OneStep.go: (ctx, state) async {
+            final value = ctx.callbackData ?? '';
+
+            if (value == 'all') {
+              // If "Delete All" is selected.
+              await ctx.db.deleteAllSearchInfo(ctx.chatId);
+              await ctx.bot.answerCallbackQuery(ctx.callbackId, ln.deleteAllSuccessCallback);
+              await ctx.bot.deleteMessage(ctx.chatId, ctx.messageId);
+              return const Done();
+            }
+            // If a specific entry is selected for deletion.
+            final index = int.parse(value);
+            await ctx.db.deleteSearchInfo(index);
+            await ctx.bot.answerCallbackQuery(ctx.callbackId, ln.deleteOneSuccessCallback);
+            await ctx.bot.deleteMessage(ctx.chatId, ctx.messageId);
+            return const Done();
+          },
+        },
+        guards: [ConsentGuard()],
+      ),
+    )
+    ..addHandler(
+      ConversationHandler.emptyState<OneStep>(
+        '/delete_me',
+        (ln) => ln.deleteMeCommandDescription,
+        (ctx, state) async {
+          final keyboard = <List<InlineKeyboardButton>>[
+            [InlineKeyboardButton(text: ln.deleteMeButtonYes, callbackData: 'delete_me_confirm_yes')],
+            [InlineKeyboardButton(text: ln.deleteMeButtonNo, callbackData: 'delete_me_confirm_no')],
+          ];
+
+          await ctx.bot.sendInlineKeyboard(ctx.chatId, ln.deleteMeConfirmationMessage, keyboard);
+
+          return const NextStep(OneStep.go);
+        },
+        steps: {
+          // Step for processing the deletion choice.
+          OneStep.go: (ctx, state) async {
+            final value = ctx.callbackData ?? '';
+            await ctx.bot.answerCallbackQuery(ctx.callbackId, '');
+            if (value == 'delete_me_confirm_yes') {
+              ctx.db.removeUserById(ctx.chatId);
+              await ctx.bot.editMessageText(ctx.chatId, ctx.messageId, ln.deleteMeSuccessMessage);
+              return const Done();
+            }
+
+            await ctx.bot.editMessageText(ctx.chatId, ctx.messageId, ln.deleteMeCancelledMessage);
+            return const Done();
+          },
+        },
+      ),
+    );
 
   // This is the function that will be called for each incoming update.
   return (int updateId, Map<String, Object?> update) {
@@ -365,15 +372,55 @@ void Function(int updateId, Map<String, Object?> update) handler({
   };
 }
 
-// Defines the steps for the '/add' command conversation.
-enum AddConversationStep {
-  number,
-  birthDate,
-  examDate,
+/// Saves the search information to the database and sends a success message.
+Future<void> _saveAndNotifySuccess(
+  Context ctx,
+  Localization ln,
+  String number,
+  String birthDate,
+  String examDate,
+) async {
+  ctx.db.saveSearchInfo(
+    chatId: ctx.chatId,
+    attendeeNumber: number,
+    birthDate: dateFormat.parse(birthDate),
+    examDate: dateFormat.parse(examDate),
+  );
+  await ctx.bot.sendMessage(ctx.chatId, ln.addSuccess);
 }
+
+// Defines the steps for the '/add' command conversation.
+enum AddConversationStep { number, birthDate, examDate }
 
 /// State storage for the /add command conversation.
 class AddState {
+  AddState({this.number, this.birthDate, this.examDate});
   String? number;
   String? birthDate;
+  String? examDate;
+
+  static AddState? tryParse(String? arg) {
+    if (arg == null) return null;
+    final parts = arg.split(' ');
+    if (parts.length != 3) return null;
+    if (!validateNumber(parts[0]) || !validateBirthDate(parts[1]) || !validateExamDate(parts[2])) {
+      return null;
+    }
+    return AddState(number: parts[0], birthDate: parts[1], examDate: parts[2]);
+  }
+
+  static bool validateNumber(String? number) {
+    if (number == null || number.isEmpty) return false;
+    return RegExp(r'^\d{7}$').hasMatch(number) || number == '000';
+  }
+
+  static bool validateBirthDate(String? birthDate) {
+    if (birthDate == null || birthDate.isEmpty) return false;
+    return dateFormat.tryParse(birthDate) != null;
+  }
+
+  static bool validateExamDate(String? examDate) {
+    if (examDate == null || examDate.isEmpty) return false;
+    return dateFormat.tryParse(examDate) != null;
+  }
 }

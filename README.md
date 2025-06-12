@@ -86,9 +86,9 @@ The application's `Arguments` class determines how environment variables are loa
 | Argument                 | Environment Variable (`.env`) | Description                                                          | Default Value          | Used By         |
 | :----------------------- | :-----------------------------| :------------------------------------------------------------------- | :--------------------- | :-------------- |
 | `-t`, `--token`          | `CONFIG_TOKEN`                | **(Required)** Your Telegram bot API token.                          | —                      | Both            |
-| `--privacy-policy-url`   | `CONFIG_PRIVACY_POLICY_URL`   | **(Required)** URL to your privacy policy document.                  | —                      | Both            |
-| `-d`, `--db`             | `CONFIG_DB_PATH`              | Path to the SQLite database file.                                    | `data/owlistic.db`     | Both            |
-| `-v`, `--verbose`        | `CONFIG_VERBOSE_LEVEL`        | Logging verbosity. Options: `all`, `debug`, `info`, `warn`, `error`. | `info`                 | Both            |
+| `--privacy-policy-url`   | `CONFIG_PRIVACY-POLICY-URL`   | **(Required)** URL to your privacy policy document.                  | —                      | Both            |
+| `-d`, `--db`             | `CONFIG_DB`                   | Path to the SQLite database file.                                    | `data/owlistic.db`     | Both            |
+| `-v`, `--verbose`        | `CONFIG_VERBOSE`              | Logging verbosity. Options: `all`, `debug`, `info`, `warn`, `error`. | `info`                 | Both            |
 | `-c`, `--chat-id`        |                               | (Integer) Specific chat ID to check.                                 | —                      | `lookup_service`|
 | `--check-days`           |                               | (Integer) How many days to check from today and back.                | `10`                   | `lookup_service`|
 | `--help`                 |                               | Show help message detailing all options and exit.                    |                        | Both            |

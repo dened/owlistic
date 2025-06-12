@@ -103,7 +103,7 @@ class TelegramBot {
         url,
         body: _jsonEncoder.convert(<String, Object?>{
           'chat_id': chatId,
-          'text': autoEscapeMarkdown ? escapeMarkdownV2(text) : text,
+          'text': (autoEscapeMarkdown && parseMode == ParseMode.markdownV2) ? escapeMarkdownV2(text) : text,
           'parse_mode': parseMode.type,
           'disable_notification': disableNotification,
           'protect_content': protectContent,

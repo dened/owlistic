@@ -9,7 +9,7 @@ import 'package:l/l.dart';
 import 'package:meta/meta.dart';
 import 'package:owlistic/src/constant/constants.dart';
 import 'package:owlistic/src/date_utils.dart';
-import 'package:owlistic/src/dto/cetrificate_entity.dart';
+import 'package:owlistic/src/dto/certificate_entity.dart';
 import 'package:owlistic/src/dto/search_info.dart' as m;
 import 'package:path/path.dart' as p;
 
@@ -386,7 +386,7 @@ mixin _UserInfoMixin on _$Database {
   FutureOr<bool> hasUserConsent(int chatId) async {
     assert(chatId > 0, 'Chat ID must be greater than 0');
     if (!_cacheConsent.containsKey(chatId)) {
-      final result = await (select(userConsent)..where((tbl) => tbl.userId.equals(chatId) & tbl.revokedAt.isNotNull()))
+      final result = await (select(userConsent)..where((tbl) => tbl.userId.equals(chatId) & tbl.revokedAt.isNull()))
           .getSingleOrNull();
       _cacheConsent[chatId] = result != null;
     }

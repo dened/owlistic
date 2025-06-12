@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:l/l.dart';
 import 'package:owlistic/src/date_utils.dart';
-import 'package:owlistic/src/dto/cetrificate_entity.dart';
+import 'package:owlistic/src/dto/certificate_entity.dart';
 
 typedef CertInfo = (
   String examinationInstituteId,
@@ -17,9 +17,20 @@ final Converter<List<int>, Map<String, Object?>> _jsonDecoder =
 /// [TelcApiClient] is a client for interacting with the Telc API.
 /// It provides methods to search for certificate information and fetch certificate data.
 class TelcApiClient {
-  TelcApiClient({http.Client? client}) : _client = client ?? http.Client();
+  TelcApiClient({
+    http.Client? client,
+    this.maxRequestsInWindow = 30,
+    this.windowDuration = const Duration(seconds: 5),
+  }) : _client = client ?? http.Client();
+
   static const String _baseUrl = 'https://results.telc.net/api/results'; // Base URL for the API
   final http.Client _client; // The HTTP client
+
+  /// Maximum number of requests allowed in the [windowDuration].
+  final int maxRequestsInWindow;
+  /// The duration of the time window for rate limiting.
+  final Duration windowDuration;
+  final List<DateTime> _requestTimestamps = [];
 
   /// Searches for certificate information based on the provided number, exam date, and birth date.
   Future<CertInfo> searchCertInfo(String nummer, DateTime pruefungDate, DateTime birthDate) async {
@@ -27,6 +38,7 @@ class TelcApiClient {
     final birthDateString = birthDate.toTeclFormat();
 
     final url = Uri.parse('$_baseUrl/loopkup/$nummer/pruefung/$pruefungDateString/birthdate/$birthDateString');
+    await _acquirePermit();
     final response = await _client.get(url);
 
     if (response.statusCode == 200) {
@@ -48,6 +60,7 @@ class TelcApiClient {
   Future<CertificateEntity> fetchCertificateData(
       String examinationInstituteId, String examId, String attendeeId) async {
     final url = Uri.parse('$_baseUrl/certificate/$examinationInstituteId/pruefungen/$examId/teilnehmer/$attendeeId');
+    await _acquirePermit();
     final response = await _client.get(url);
 
     if (response.statusCode == 200) {
@@ -62,6 +75,32 @@ class TelcApiClient {
     } else {
       l.e('Failed to fetch certificate data: ${response.statusCode}');
       throw Exception('Failed to fetch certificate data: ${response.statusCode}');
+    }
+  }
+
+  /// Acquires a permit to make an API request, respecting the rate limit.
+  /// If the rate limit is hit, this method will pause execution until a permit can be acquired.
+  Future<void> _acquirePermit() async {
+    // Loop until a permit is acquired
+    // ignore: literal_only_boolean_expressions
+    while (true) {
+      final now = DateTime.now();
+      // Remove timestamps older than the window duration
+      _requestTimestamps.removeWhere((timestamp) => now.difference(timestamp) > windowDuration);
+
+      if (_requestTimestamps.length < maxRequestsInWindow) {
+        // Permit acquired
+        _requestTimestamps.add(now);
+        return;
+      } else {
+        // Rate limit hit, calculate wait time
+        final oldestRequestTimeInWindow = _requestTimestamps.first;
+        final timePassedSinceOldest = now.difference(oldestRequestTimeInWindow);
+        final timeToWait = windowDuration - timePassedSinceOldest;
+
+        l.d('Rate limit reached. Waiting for ${timeToWait.inMilliseconds}ms before next request.');
+        await Future<void>.delayed(timeToWait > Duration.zero ? timeToWait : Duration.zero);
+      }
     }
   }
 }

@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'dart:io' as io;
 import 'package:owlistic/owlistic.dart';
 
 Future<void> main(List<String> args) async {
@@ -19,4 +19,6 @@ Future<void> main(List<String> args) async {
       await service.checkAll(checkDays);
     }
   });
+
+  io.exit(0);
 }

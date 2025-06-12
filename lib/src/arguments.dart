@@ -15,6 +15,7 @@ final class Arguments {
 
   factory Arguments.parse(List<String> arguments) {
     final parser = ArgParser()
+      ..addFlag('help', abbr: 'h', negatable: false, defaultsTo: false, help: 'Print this usage information')
       ..addOption(
         'token',
         abbr: 't',
@@ -35,8 +36,8 @@ final class Arguments {
         aliases: ['database', 'sqlite', 'sql', 'file', 'path'],
         mandatory: false,
         help: 'Path to the SQLite database file',
-        defaultsTo: 'data/owliistic.db',
-        valueHelp: 'data/owliistic.db',
+        defaultsTo: 'data/owlistic.db',
+        valueHelp: 'data/owlistic.db',
       )
       ..addOption(
         'chat-id',
@@ -57,6 +58,7 @@ final class Arguments {
         valueHelp: 'https://example.com/privacy-policy/',
       );
 
+    const flags = <String>{'help'};
     const options = <String>{
       'token',
       'verbose',
@@ -75,6 +77,14 @@ final class Arguments {
             if (line.length >= 3 && !line.startsWith('#'))
               if (line.split('=') case List<String> parts when parts.length == 2)
                 parts[0].trimRight().toLowerCase(): parts[1].trimLeft(),
+
+        // --- From CONFIG_ platform environment --- //
+        for (final MapEntry<String, String>(:key, :value) in io.Platform.environment.entries)
+          if (key.startsWith('CONFIG_')) key.substring(7).toLowerCase(): value,
+
+        // --- Flags --- //
+        for (final flag in flags)
+          if (results.wasParsed(flag)) flag: results.flag(flag) ? 'true' : 'false',
       };
 
       table.addAll({
@@ -87,6 +97,17 @@ final class Arguments {
             option.toLowerCase(): byDefault,
       });
 
+      if (switch (table['help']?.trim().toLowerCase()) {
+        'true' || 'yes' || 'y' || '1' || '+' || 'on' || '' => true,
+        _ => false,
+      }) {
+        io.stdout
+          ..writeln(_help.trim())
+          ..writeln()
+          ..writeln(parser.usage);
+        io.exit(0);
+      }
+
       for (final option in parser.options.values) {
         if (!option.mandatory) continue;
         if (table[option.name] != null) continue;
@@ -97,7 +118,7 @@ final class Arguments {
       return Arguments._(
         token: table['token'] ?? '',
         privacyPolicyUrl: table['privacy-policy-url'] ?? '',
-        database: table['db'] ?? 'data/owliistic.db',
+        database: table['db'] ?? 'data/owlistic.db',
         verbose: switch (table['verbose']?.trim().toLowerCase()) {
           'v' || 'all' || 'verbose' => const logger.LogLevel.vvvvvv(),
           'd' || 'debug' => const logger.LogLevel.debug(),
@@ -135,3 +156,11 @@ final class Arguments {
   /// How many days to check for search certificate
   final int? checkDays;
 }
+
+const String _help = '''
+Telegram Owlistic Bot
+
+Telegram Owlistic Bot is a bot written in Dart. It helps users automatically 
+track their Telc exam results by allowing them to register their exam details 
+and receive notifications when their certificates become available.
+''';

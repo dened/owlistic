@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' as io;
 
 import 'package:l/l.dart';
 import 'package:owlistic/owlistic.dart';
@@ -6,12 +7,61 @@ import 'package:owlistic/owlistic.dart';
 /// Runs the Telegram bot.
 ///
 Future<void> main(List<String> args) async {
+  // Handle the shutdown event
+  l.i('Press [Ctrl+C] to exit');
+  shutdownHandler(() async {
+    l.i('Shutting down');
+    io.exit(0);
+  }).ignore();
+
   await runApplication(args, (dependencies) async {
+    await dependencies.db.customStatement('VACUUM;');
+
+    Timer.periodic(const Duration(days: 5), (_) async {
+      await dependencies.db.customStatement('VACUUM;'); // Compact the database every five days
+      l.i('Database "${dependencies.arguments.database}" is compacted');
+    });
 // Initialize the Telegram bot and register the main update handler.
     dependencies.bot
       ..addHandler(handler(dp: dependencies))
       ..start();
   });
+}
+
+/// Handles the command line arguments.
+Future<T?> shutdownHandler<T extends Object?>([final Future<T> Function()? onShutdown]) {
+  //StreamSubscription<String>? userKeySub;
+  StreamSubscription<io.ProcessSignal>? sigIntSub;
+  StreamSubscription<io.ProcessSignal>? sigTermSub;
+  final shutdownCompleter = Completer<T>.sync();
+  var catchShutdownEvent = false;
+  {
+    Future<void> signalHandler(io.ProcessSignal signal) async {
+      if (catchShutdownEvent) return;
+      catchShutdownEvent = true;
+      l.i('Received signal "$signal" - closing');
+      T? result;
+      try {
+        //userKeySub?.cancel();
+        sigIntSub?.cancel().ignore();
+        sigTermSub?.cancel().ignore();
+        result = await onShutdown?.call().catchError((Object error, StackTrace stackTrace) {
+          l.e('Error during shutdown | $error', stackTrace);
+          io.exit(2);
+        });
+      } finally {
+        if (!shutdownCompleter.isCompleted) shutdownCompleter.complete(result);
+      }
+    }
+
+    sigIntSub = io.ProcessSignal.sigint.watch().listen(signalHandler, cancelOnError: false);
+
+    // SIGTERM is not supported on Windows.
+    // Attempting to register a SIGTERM handler raises an exception.
+    if (!io.Platform.isWindows)
+      sigTermSub = io.ProcessSignal.sigterm.watch().listen(signalHandler, cancelOnError: false);
+  }
+  return shutdownCompleter.future;
 }
 
 /// Creates the main update handler for the Telegram bot.
@@ -63,12 +113,12 @@ void Function(int updateId, Map<String, Object?> update) handler({
           );
           ctx.db.saveUserConsent(
             userId: ctx.chatId,
-            consentText: ln.startBotWith, 
+            consentText: ln.startBotWith,
           );
-          await ctx.bot.answerCallbackQuery(ctx.callbackId, ''); 
+          await ctx.bot.answerCallbackQuery(ctx.callbackId, '');
           await ctx.bot.editMessageText(ctx.chatId, ctx.messageId, ln.consentGivenMessage);
         } else if (callbackData == 'consent_decline') {
-          await ctx.bot.answerCallbackQuery(ctx.callbackId, ''); 
+          await ctx.bot.answerCallbackQuery(ctx.callbackId, '');
           await ctx.bot.editMessageText(ctx.chatId, ctx.messageId, ln.consentDeclinedMessage);
         }
 
@@ -84,7 +134,9 @@ void Function(int updateId, Map<String, Object?> update) handler({
         await ExternalLookupService.run(ctx.chatId, checkDays: checkDays);
         // Delete the "Starting results check..." message after a delay.
         Future.delayed(const Duration(seconds: 5), () => ctx.bot.deleteMessage(ctx.chatId, messageId));
-      }),
+      }, guards: [
+        ConsentGuard(),
+      ]),
     )
     // Conversation handler for the /language command.
     ..addHandler(

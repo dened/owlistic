@@ -37,6 +37,7 @@ final class TelcCertificateLookupService {
   /// The [daysForCheck] parameter specifies the number of days around the exam date to check.
   Future<void> checkAll(int daysForCheck) async {
     // Retrieve all search tasks that need to be processed.
+    l.i('Checking all search tasks for certificates during the previous $daysForCheck days...');
     final allSearchTasks = await _db.getAllSearchInfo();
     await _checkSearchInfoList(allSearchTasks, daysForCheck);
   }
@@ -47,6 +48,7 @@ final class TelcCertificateLookupService {
   /// and processes them to find corresponding certificates.
   /// The [daysForCheck] parameter specifies the number of days around the exam date to check.
   Future<void> checkByUser(int chatId, int daysForCheck) async {
+    l.i('Checking search tasks for user $chatId for certificates during the previous $daysForCheck days...');
     final searchTask = await _db.getSearchInfo(chatId);
     await _checkSearchInfoList(searchTask, daysForCheck);
   }
@@ -57,6 +59,7 @@ final class TelcCertificateLookupService {
   /// For each task, it attempts to find certificate information and then fetches the certificate.
   /// The [daysForCheck] parameter specifies the number of days around the exam date to check.
   Future<void> _checkSearchInfoList(List<SearchInfo> allSearchTasks, int daysForCheck) async {
+    l.i('Checking ${allSearchTasks.length} search tasks for certificates...');
     for (var i = 0; i < allSearchTasks.length; i += batchSize) {
       final batch = allSearchTasks.skip(i).take(batchSize);
       await Future.wait(batch.map((info) async {
@@ -95,6 +98,7 @@ final class TelcCertificateLookupService {
         await Future<void>.delayed(batchDelay);
       }
     }
+    l.i('All search tasks have been processed.');
   }
 
   /// Looks up the certificate information for a given [number] and [birthDate].

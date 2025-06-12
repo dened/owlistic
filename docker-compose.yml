@@ -1,0 +1,17 @@
+# docker compose build
+# docker compose up -d
+# https://github.com/dened/owlistic
+services:
+  owlistic:
+    hostname: owlistic
+    image: owlistic:latest
+    command: /app/entrypoint.sh
+    environment:
+      CONFIG_TOKEN: 123:ABC
+      CONFIG_PRIVACY-POLICY-URL: https://example.com/privacy 
+      CONFIG_DB: /app/data/owlistic.db
+    volumes:
+      - ./data:/app/data
+    build:
+      context: .
+      dockerfile: Dockerfile

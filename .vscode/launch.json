@@ -8,7 +8,7 @@
             "name": "owlistic",
             "request": "launch",
             "type": "dart",
-            "program": "bin/telegram_bot.dart"
+            "program": "bin/owlistic.dart"
         },
         {
             "name": "Dart: Debug lookup_service",

@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:l/l.dart';
 import 'package:owlistic/owlistic.dart';
 
-
 /// An abstraction for running an application with common initialization.
 ///
 /// The [app] function contains the unique logic for a specific application

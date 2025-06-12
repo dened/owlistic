@@ -1,0 +1,1 @@
+0 10-18 * * 1-5 /app/lookup_service.run >> /app/cron.log 2>&1

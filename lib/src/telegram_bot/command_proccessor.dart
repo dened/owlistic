@@ -19,13 +19,10 @@ class CommandProcessor {
   /// - [bot]: The [TelegramBot] instance for interacting with the Telegram API.
   /// - [db]: The [Database] instance for data persistence.
   /// - [ln]: The [Localization] instance for handling internationalization.
-  CommandProcessor({
-    required TelegramBot bot,
-    required Database db,
-    required Localization ln,
-  })  : _bot = bot,
-        _db = db,
-        _ln = ln;
+  CommandProcessor({required TelegramBot bot, required Database db, required Localization ln})
+    : _bot = bot,
+      _db = db,
+      _ln = ln;
 
   final TelegramBot _bot;
   final Database _db;
@@ -50,12 +47,7 @@ class CommandProcessor {
   /// It creates a [Context], checks for active sessions, and then
   /// attempts to find a suitable handler for the update.
   void call(Map<String, Object?> update) {
-    final context = Context(
-      update: update,
-      bot: _bot,
-      db: _db,
-      ln: _ln,
-    );
+    final context = Context(update: update, bot: _bot, db: _db, ln: _ln);
     final chatId = context.chatId;
     final session = _sessions[chatId];
 
@@ -75,29 +67,27 @@ class CommandProcessor {
 
     // Asynchronously process handlers to avoid blocking the main isolate.
     // This is important because `handler.canActivate` can be async (e.g., DB lookups).
-    Future<void>(
-      () async {
-        for (final handler in _handlers) {
-          if (handler.canHandle(context)) {
-            // Check guards before activating the handler.
-            final canActivate = await handler.canActivate(context);
-            if (!canActivate) {
-              // If guards prevent activation, stop processing for this update
-              // to prevent other handlers from being checked unnecessarily for this specific update.
-              return;
-            }
-            // If the handler is a ConversationHandler, store it as an active session.
-            if (handler is ConversationHandler) {
-              _sessions[chatId] = handler;
-            }
-            // Execute the handler.
-            handler.handle(context);
-            // Once a handler is found and executed, stop iterating.
+    Future<void>(() async {
+      for (final handler in _handlers) {
+        if (handler.canHandle(context)) {
+          // Check guards before activating the handler.
+          final canActivate = await handler.canActivate(context);
+          if (!canActivate) {
+            // If guards prevent activation, stop processing for this update
+            // to prevent other handlers from being checked unnecessarily for this specific update.
             return;
           }
+          // If the handler is a ConversationHandler, store it as an active session.
+          if (handler is ConversationHandler) {
+            _sessions[chatId] = handler;
+          }
+          // Execute the handler.
+          handler.handle(context);
+          // Once a handler is found and executed, stop iterating.
+          return;
         }
-      },
-    );
+      }
+    });
   }
 
   /// Registers a [BaseHandler] with the processor.

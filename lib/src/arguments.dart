@@ -14,59 +14,38 @@ final class Arguments {
   });
 
   factory Arguments.parse(List<String> arguments) {
-    final parser = ArgParser()
-      ..addFlag('help', abbr: 'h', negatable: false, defaultsTo: false, help: 'Print this usage information')
-      ..addOption(
-        'token',
-        abbr: 't',
-        mandatory: true,
-        help: 'Telegram bot token',
-        valueHelp: '123:ABC-DEF',
-      )
-      ..addOption(
-        'verbose',
-        abbr: 'v',
-        defaultsTo: 'all',
-        help: 'Verbose mode for output: all | debug | info | warn | error',
-        valueHelp: 'info',
-      )
-      ..addOption(
-        'db',
-        abbr: 'd',
-        aliases: ['database', 'sqlite', 'sql', 'file', 'path'],
-        mandatory: false,
-        help: 'Path to the SQLite database file',
-        defaultsTo: 'data/owlistic.db',
-        valueHelp: 'data/owlistic.db',
-      )
-      ..addOption(
-        'chat-id',
-        abbr: 'c',
-        help: 'Chat ID for manually checking results',
-        valueHelp: '12345678',
-      )
-      ..addOption(
-        'check-days',
-        help: 'How many days to check for search certificate',
-        valueHelp: '15',
-      )
-      ..addOption(
-        'privacy-policy-url',
-        abbr: 'p',
-        mandatory: true,
-        help: 'Privacy Policy URL',
-        valueHelp: 'https://example.com/privacy-policy/',
-      );
+    final parser =
+        ArgParser()
+          ..addFlag('help', abbr: 'h', negatable: false, defaultsTo: false, help: 'Print this usage information')
+          ..addOption('token', abbr: 't', mandatory: true, help: 'Telegram bot token', valueHelp: '123:ABC-DEF')
+          ..addOption(
+            'verbose',
+            abbr: 'v',
+            defaultsTo: 'all',
+            help: 'Verbose mode for output: all | debug | info | warn | error',
+            valueHelp: 'info',
+          )
+          ..addOption(
+            'db',
+            abbr: 'd',
+            aliases: ['database', 'sqlite', 'sql', 'file', 'path'],
+            mandatory: false,
+            help: 'Path to the SQLite database file',
+            defaultsTo: 'data/owlistic.db',
+            valueHelp: 'data/owlistic.db',
+          )
+          ..addOption('chat-id', abbr: 'c', help: 'Chat ID for manually checking results', valueHelp: '12345678')
+          ..addOption('check-days', help: 'How many days to check for search certificate', valueHelp: '15')
+          ..addOption(
+            'privacy-policy-url',
+            abbr: 'p',
+            mandatory: true,
+            help: 'Privacy Policy URL',
+            valueHelp: 'https://example.com/privacy-policy/',
+          );
 
     const flags = <String>{'help'};
-    const options = <String>{
-      'token',
-      'verbose',
-      'db',
-      'chat-id',
-      'check-days',
-      'privacy-policy-url',
-    };
+    const options = <String>{'token', 'verbose', 'db', 'chat-id', 'check-days', 'privacy-policy-url'};
 
     try {
       final results = parser.parse(arguments);

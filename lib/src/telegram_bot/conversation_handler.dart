@@ -14,10 +14,7 @@ import 'package:owlistic/src/telegram_bot/guard.dart';
 ///
 /// - [T] is an [Enum] representing the possible steps in the conversation.
 /// - [State] is the type of the state object associated with this conversation.
-typedef ConversationStepCallback<T extends Enum, State> = FutureOr<Step<T>> Function(
-  Context ctx,
-  State state,
-);
+typedef ConversationStepCallback<T extends Enum, State> = FutureOr<Step<T>> Function(Context ctx, State state);
 
 /// A type alias for chat ID, typically an integer.
 typedef ChatId = int;
@@ -58,15 +55,14 @@ class ConversationHandler<T extends Enum, State> extends BaseHandler with Comman
     required Map<T, ConversationStepCallback<T, State>> steps,
     required StateBuilder<State> stateBuilder,
     List<Guard>? guards,
-  }) =>
-      ConversationHandler<T, State>._internal(
-        command,
-        description,
-        entryCallback,
-        steps: steps,
-        stateBuilder: stateBuilder,
-        guards: guards,
-      );
+  }) => ConversationHandler<T, State>._internal(
+    command,
+    description,
+    entryCallback,
+    steps: steps,
+    stateBuilder: stateBuilder,
+    guards: guards,
+  );
 
   /// Private constructor for [ConversationHandler].
   ///
@@ -78,12 +74,12 @@ class ConversationHandler<T extends Enum, State> extends BaseHandler with Comman
     required Map<T, ConversationStepCallback<T, State>> steps,
     required StateBuilder<State> stateBuilder,
     super.guards,
-  })  : _command = command,
-        _description = description,
-        _entryCallback = entryCallback,
-        _steps = steps,
-        _stateBuilder = stateBuilder,
-        super();
+  }) : _command = command,
+       _description = description,
+       _entryCallback = entryCallback,
+       _steps = steps,
+       _stateBuilder = stateBuilder,
+       super();
 
   /// Creates a [ConversationHandler] that uses an [EmptyState].
   ///
@@ -101,15 +97,14 @@ class ConversationHandler<T extends Enum, State> extends BaseHandler with Comman
     ConversationStepCallback<T, EmptyState> entryCallback, {
     required Map<T, ConversationStepCallback<T, EmptyState>> steps,
     List<Guard>? guards,
-  }) =>
-      ConversationHandler<T, EmptyState>._internal(
-        command,
-        description,
-        entryCallback,
-        steps: steps,
-        stateBuilder: emptyStateBuilder, // Uses a predefined builder for EmptyState
-        guards: guards,
-      );
+  }) => ConversationHandler<T, EmptyState>._internal(
+    command,
+    description,
+    entryCallback,
+    steps: steps,
+    stateBuilder: emptyStateBuilder, // Uses a predefined builder for EmptyState
+    guards: guards,
+  );
 
   final String _command;
   final DescriptionCallback _description;
@@ -144,7 +139,8 @@ class ConversationHandler<T extends Enum, State> extends BaseHandler with Comman
     // If no state or conversation was reset (nextStep is null)
     if (state == null || state.nextStep == null) {
       // Check if the current context can start THIS conversation
-      if (super.canHandle(ctx)) { // Uses canHandle from CommandHandlerMixin
+      if (super.canHandle(ctx)) {
+        // Uses canHandle from CommandHandlerMixin
         try {
           // Create a new state for the conversation
           state = ConversationState<T, State>(_stateBuilder());
@@ -170,7 +166,9 @@ class ConversationHandler<T extends Enum, State> extends BaseHandler with Comman
 
     final stepCallback = _steps[currentStepEnum];
     if (stepCallback == null) {
-      l.e('Conversation step callback not found for step $currentStepEnum in command $command. Available steps: ${_steps.keys}');
+      l.e(
+        'Conversation step callback not found for step $currentStepEnum in command $command. Available steps: ${_steps.keys}',
+      );
       reset(chatId); // Reset session if step definition is missing
       return;
     }
@@ -196,7 +194,9 @@ class ConversationHandler<T extends Enum, State> extends BaseHandler with Comman
         state.nextStep = nextStep.step;
         // Ensure the next step is actually defined in the conversation's steps
         if (!_steps.containsKey(state.nextStep)) {
-          l.e('Error: Next step ${state.nextStep} returned by callback is not present in the configured steps for command $command. Available: ${_steps.keys}');
+          l.e(
+            'Error: Next step ${state.nextStep} returned by callback is not present in the configured steps for command $command. Available: ${_steps.keys}',
+          );
           reset(chatId);
         }
         break;

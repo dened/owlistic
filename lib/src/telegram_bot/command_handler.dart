@@ -21,14 +21,10 @@ class CommandHandler extends BaseHandler with CommandHandlerMixin {
   ///   and guards pass.
   /// - [guards]: An optional list of [Guard]s that can prevent the handler
   ///   from activating.
-  CommandHandler(
-    String command,
-    DescriptionCallback description,
-    Handler callback, {
-    super.guards,
-  })  : _command = command,
-        _description = description,
-        _callback = callback;
+  CommandHandler(String command, DescriptionCallback description, Handler callback, {super.guards})
+    : _command = command,
+      _description = description,
+      _callback = callback;
 
   final String _command;
   final DescriptionCallback _description;

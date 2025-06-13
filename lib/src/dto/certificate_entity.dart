@@ -4,10 +4,7 @@ part 'certificate_entity.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class CertificateEntity {
-  CertificateEntity({
-    required this.language,
-    required this.content,
-  });
+  CertificateEntity({required this.language, required this.content});
 
   factory CertificateEntity.fromJson(Map<String, dynamic> json) => _$CertificateEntityFromJson(json);
   final String language;
@@ -18,24 +15,17 @@ class CertificateEntity {
 
 @JsonSerializable(explicitToJson: true)
 class CertificateSection {
-  CertificateSection({
-    required this.type,
-    required this.content,
-  });
+  CertificateSection({required this.type, required this.content});
 
   factory CertificateSection.fromJson(Map<String, dynamic> json) => CertificateSection(
-        type: json['type'] as String,
-        content: (json['content'] as List<dynamic>)
-            .map((e) => CertificateContent.fromJson(e as Map<String, dynamic>))
-            .toList(),
-      );
+    type: json['type'] as String,
+    content:
+        (json['content'] as List<dynamic>).map((e) => CertificateContent.fromJson(e as Map<String, dynamic>)).toList(),
+  );
   final String type;
   final List<CertificateContent> content;
 
-  Map<String, dynamic> toJson() => {
-        'type': type,
-        'content': content.map((e) => e.toJson()).toList(),
-      };
+  Map<String, dynamic> toJson() => {'type': type, 'content': content.map((e) => e.toJson()).toList()};
 }
 
 sealed class CertificateContent {
@@ -226,9 +216,7 @@ class UnknownTypeContent extends CertificateContent {
   Map<String, dynamic> toJson() => data;
 }
 
-
 extension CertificateContentExtension on CertificateEntity {
-
   CertificateSection get grades => content.firstWhere((section) => section.type == 'grades');
   CertificateSection get personalData => content.firstWhere((section) => section.type == 'personalData');
 }

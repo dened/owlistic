@@ -6,20 +6,20 @@ import 'package:owlistic/src/localization/localization.dart';
 import 'package:owlistic/src/telegram_bot/telegram_bot.dart';
 
 abstract interface class LookupServiceHandler {
-  Future<void> certFound(
-      {required SearchInfo searchInfo, required String link, required CertificateEntity certificate});
+  Future<void> certFound({
+    required SearchInfo searchInfo,
+    required String link,
+    required CertificateEntity certificate,
+  });
 
   Future<void> certNotFound(int daysCount, SearchInfo searchInfo);
 }
 
 final class TelegramNotificationHandler implements LookupServiceHandler {
-  TelegramNotificationHandler({
-    required TelegramBot bot,
-    required Database db,
-    required Localization ln,
-  })  : _bot = bot,
-        _db = db,
-        _ln = ln;
+  TelegramNotificationHandler({required TelegramBot bot, required Database db, required Localization ln})
+    : _bot = bot,
+      _db = db,
+      _ln = ln;
 
   final TelegramBot _bot;
   final Database _db;
@@ -42,10 +42,7 @@ final class TelegramNotificationHandler implements LookupServiceHandler {
         searchInfo.chatId,
         () => _ln.certNotFoundMessage(daysCount, searchInfo.nummer),
       );
-      final messageId = await _bot.sendMessage(
-        searchInfo.chatId,
-        certNotFoundMessage,
-      );
+      final messageId = await _bot.sendMessage(searchInfo.chatId, certNotFoundMessage);
       _db.setKey(searchInfo.key, messageId);
       l.i('Saved message ID $messageId for ${searchInfo.nummer}');
     } on ForbiddenTelegramException catch (error) {
@@ -57,21 +54,15 @@ final class TelegramNotificationHandler implements LookupServiceHandler {
   }
 
   @override
-  Future<void> certFound(
-      {required SearchInfo searchInfo, required String link, required CertificateEntity certificate}) async {
+  Future<void> certFound({
+    required SearchInfo searchInfo,
+    required String link,
+    required CertificateEntity certificate,
+  }) async {
     try {
       final formattedMessage = await _formatCertificate(certificate, link, searchInfo.chatId);
-      await _bot.sendMessage(
-        searchInfo.chatId,
-        formattedMessage,
-        autoEscapeMarkdown: false,
-        parseMode: ParseMode.html,
-      );
-      await _db.saveCertificate(
-        searchInfoId: searchInfo.id,
-        link: link,
-        entity: certificate,
-      );
+      await _db.saveCertificate(searchInfoId: searchInfo.id, link: link, entity: certificate);
+      await _bot.sendMessage(searchInfo.chatId, formattedMessage, autoEscapeMarkdown: false, parseMode: ParseMode.html);
     } on ForbiddenTelegramException catch (error) {
       await _db.removeUserById(error.chatId);
       l.e('Bot is blocked: $error');
@@ -99,21 +90,22 @@ final class TelegramNotificationHandler implements LookupServiceHandler {
     final fullNameLabel = await _ln.withChatId(chatId, () => _ln.certFoundFullNameLabel);
     final linkText = await _ln.withChatId(chatId, () => _ln.certFoundLinkText);
 
-    final buffer = StringBuffer()
-      ..writeln('<b>$title</b>')
-      ..writeln('');
+    final buffer =
+        StringBuffer()
+          ..writeln('<b>$title</b>')
+          ..writeln('');
 
     final personalData = certificate.personalData.content;
-    if ({for (final c in personalData) c.type: c}
-        case {
-          'lastname': LastnameContent lastname,
-          'firstname': FirstnameContent firstname,
-        }) {
+    if ({for (final c in personalData) c.type: c} case {
+      'lastname': LastnameContent lastname,
+      'firstname': FirstnameContent firstname,
+    }) {
       buffer.writeln('<b>$fullNameLabel</b> ${firstname.content} ${lastname.content}');
     }
 
-    final content =
-        certificate.grades.content.whereType<PointsAndTextContent>().map((c) => (c.title, '${c.points}/${c.content}'));
+    final content = certificate.grades.content.whereType<PointsAndTextContent>().map(
+      (c) => (c.title, '${c.points}/${c.content}'),
+    );
 
     buffer.writeln();
     for (final (title, points) in content) {

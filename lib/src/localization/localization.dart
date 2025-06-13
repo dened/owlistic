@@ -135,6 +135,9 @@ By clicking the "Agree" button, you confirm your acceptance of our Privacy Polic
   String get langGerman => Intl.message('German', name: 'langGerman');
   String get langRussian => Intl.message('Russian', name: 'langRussian');
   String get langUkrainian => Intl.message('Ukrainian', name: 'langUkrainian');
+  String get langUkrainian1 => Intl.message('Ukrainian', name: 'langUkrainian1');
+  String get langUkrainian2 => Intl.message('Ukrainian', name: 'langUkrainian2');
+  String get langUkrainian3 => Intl.message('Ukrainian', name: 'langUkrainian3');
 
   /// Returns the localized display name for a given language code.
   /// This method should be called within a locale context (e.g., via `withChatId`),

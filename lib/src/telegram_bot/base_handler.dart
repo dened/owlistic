@@ -22,9 +22,7 @@ typedef Handler = FutureOr<void> Function(Context ctx);
 /// before the handler's [handle] method is executed.
 abstract class BaseHandler {
   /// Creates a new [BaseHandler] with optional [guards].
-  BaseHandler({
-    List<Guard>? guards,
-  }) : _guards = guards ?? const <Guard>[];
+  BaseHandler({List<Guard>? guards}) : _guards = guards ?? const <Guard>[];
 
   final List<Guard> _guards;
 

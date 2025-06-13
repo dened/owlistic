@@ -5,11 +5,11 @@ class SearchInfo {
     required String nummer,
     required DateTime examDate,
     required DateTime birthDate,
-  })  : _id = id,
-        _chatId = chatId,
-        _nummer = nummer,
-        _examDate = examDate,
-        _birthDate = birthDate;
+  }) : _id = id,
+       _chatId = chatId,
+       _nummer = nummer,
+       _examDate = examDate,
+       _birthDate = birthDate;
 
   final int _id;
   final int _chatId;

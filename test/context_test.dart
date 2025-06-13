@@ -33,14 +33,9 @@ void main() {
             {'type': 'bot_command', 'offset': 0, 'length': 6},
             {'type': 'bot_command', 'offset': 7, 'length': 5},
           ],
-        }
+        },
       };
-      final context = Context(
-        update: update,
-        bot: mockTelegramBot,
-        db: mockDatabase,
-        ln: mockLn
-      );
+      final context = Context(update: update, bot: mockTelegramBot, db: mockDatabase, ln: mockLn);
 
       expect(context.commands, ['/start', '/help']);
     });
@@ -54,16 +49,11 @@ void main() {
           'entities': [
             {'offset': 0, 'length': 4, 'type': 'bot_command'},
             {'offset': 10, 'length': 5, 'type': 'bot_command'},
-            {'offset': 29, 'length': 2, 'type': 'bot_command'}
-          ]
-        }
+            {'offset': 29, 'length': 2, 'type': 'bot_command'},
+          ],
+        },
       };
-      final context = Context(
-        update: update,
-        bot: mockTelegramBot,
-        db: mockDatabase,
-        ln: mockLn
-      );
+      final context = Context(update: update, bot: mockTelegramBot, db: mockDatabase, ln: mockLn);
 
       expect(context.getArgs(), {'/che': '2342', '/rest': 'aassd asd as'});
     });
@@ -77,14 +67,9 @@ void main() {
           'entities': [
             {'type': 'bot_command', 'offset': 0, 'length': 6},
           ],
-        }
+        },
       };
-      final context = Context(
-        update: update,
-        bot: mockTelegramBot,
-        db: mockDatabase,
-        ln: mockLn
-      );
+      final context = Context(update: update, bot: mockTelegramBot, db: mockDatabase, ln: mockLn);
 
       expect(context.getArgs(), isEmpty);
     });

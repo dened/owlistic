@@ -5,11 +5,7 @@ import 'package:l/l.dart';
 import 'package:owlistic/src/date_utils.dart';
 import 'package:owlistic/src/dto/certificate_entity.dart';
 
-typedef CertInfo = (
-  String examinationInstituteId,
-  String examId,
-  String attendeeId,
-);
+typedef CertInfo = (String examinationInstituteId, String examId, String attendeeId);
 
 final Converter<List<int>, Map<String, Object?>> _jsonDecoder =
     utf8.decoder.fuse(json.decoder).cast<List<int>, Map<String, Object?>>();
@@ -17,17 +13,15 @@ final Converter<List<int>, Map<String, Object?>> _jsonDecoder =
 /// [TelcApiClient] is a client for interacting with the Telc API.
 /// It provides methods to search for certificate information and fetch certificate data.
 class TelcApiClient {
-  TelcApiClient({
-    http.Client? client,
-    this.maxRequestsInWindow = 30,
-    this.windowDuration = const Duration(seconds: 5),
-  }) : _client = client ?? http.Client();
+  TelcApiClient({http.Client? client, this.maxRequestsInWindow = 30, this.windowDuration = const Duration(seconds: 5)})
+    : _client = client ?? http.Client();
 
   static const String _baseUrl = 'https://results.telc.net/api/results'; // Base URL for the API
   final http.Client _client; // The HTTP client
 
   /// Maximum number of requests allowed in the [windowDuration].
   final int maxRequestsInWindow;
+
   /// The duration of the time window for rate limiting.
   final Duration windowDuration;
   final List<DateTime> _requestTimestamps = [];
@@ -58,7 +52,10 @@ class TelcApiClient {
 
   /// Fetches the certificate data based on the provided examination institute ID, exam ID, and attendee ID.
   Future<CertificateEntity> fetchCertificateData(
-      String examinationInstituteId, String examId, String attendeeId) async {
+    String examinationInstituteId,
+    String examId,
+    String attendeeId,
+  ) async {
     final url = Uri.parse('$_baseUrl/certificate/$examinationInstituteId/pruefungen/$examId/teilnehmer/$attendeeId');
     await _acquirePermit();
     final response = await _client.get(url);

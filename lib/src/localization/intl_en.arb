@@ -1,6 +1,5 @@
 {
-  "@@locale": "en",
-  "@@last_modified": "2025-06-13T10:36:59.524911",
+  "@@last_modified": "2025-06-13T12:45:51.975890",
   "helpListHeader": "Available commands:",
   "@helpListHeader": {
     "description": "Header for the list of available commands in the help message.",
@@ -128,6 +127,21 @@
   },
   "langUkrainian": "Ukrainian",
   "@langUkrainian": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "langUkrainian1": "Ukrainian",
+  "@langUkrainian1": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "langUkrainian2": "Ukrainian",
+  "@langUkrainian2": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "langUkrainian3": "Ukrainian",
+  "@langUkrainian3": {
     "type": "text",
     "placeholders": {}
   },

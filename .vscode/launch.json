@@ -17,7 +17,7 @@
             "program": "bin/lookup_service.dart",
             "args": [
 
-                "--chat-id", "6552159924",
+                "--chat-id", "7766648758",
                 "--check-days", "15" 
             ]
         },

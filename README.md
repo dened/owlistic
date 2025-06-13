@@ -2,8 +2,8 @@
 
 [![Checkout](https://github.com/dened/owlistic/actions/workflows/checkout.yml/badge.svg)](https://github.com/dened/owlistic/actions) 
 [![Build](https://github.com/dened/owlistic/actions/workflows/build.yml/badge.svg)](https://github.com/dened/owlistic/actions)
+[![DockerHub](https://img.shields.io/docker/pulls/dchuvasov/owlistic)](https://hub.docker.com/r/dchuvasov/owlistic)
 [![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg)](https://opensource.org/licenses/MIT) 
-
 ![](.img/logo.png)
 
 **Owlistic** is a Telegram bot that helps users track their **Telc exam results**. Users simply enter their exam details, and the bot checks the official portal regularly. Once your certificate is available — you'll get a notification right in Telegram.

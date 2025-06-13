@@ -14,34 +14,32 @@ import 'package:owlistic/owlistic.dart';
 Future<void> runApplication(
   /// The command-line arguments.
   List<String> args,
-  Future<void> Function(
-    Dependencies dependencies,
-  ) app,
+  Future<void> Function(Dependencies dependencies) app,
 ) async {
   final arguments = Arguments.parse(args);
   await initializeDateFormatting('ru');
   l.capture<void>(
     // Run the application within a zoned guard to catch top-level errors.
-    () => runZonedGuarded<void>(() async {
-      final db = Database.lazy(path: arguments.database);
-      await db.refresh();
-      l.i('Database is ready');
+    () => runZonedGuarded<void>(
+      () async {
+        final db = Database.lazy(path: arguments.database);
+        await db.refresh();
+        l.i('Database is ready');
 
-      // Retrieve the last update ID for the Telegram bot.
-      final lastUpdateId = db.getKey<int>(updateIdKey);
-      final bot = TelegramBot(
-        token: arguments.token,
-        offset: lastUpdateId,
-      );
-      final ln = Localization(db: db);
-      await ln.initializeAllMessages();
+        // Retrieve the last update ID for the Telegram bot.
+        final lastUpdateId = db.getKey<int>(updateIdKey);
+        final bot = TelegramBot(token: arguments.token, offset: lastUpdateId);
+        final ln = Localization(db: db);
+        await ln.initializeAllMessages();
 
-      // Execute the application-specific logic.
-      await app(Dependencies(db: db, bot: bot, arguments: arguments, ln: ln));
-    }, (error, stackTrace) {
-      l.e('An top level error occurred. $error', stackTrace);
-      debugger(); // Set a breakpoint here
-    }),
+        // Execute the application-specific logic.
+        await app(Dependencies(db: db, bot: bot, arguments: arguments, ln: ln));
+      },
+      (error, stackTrace) {
+        l.e('An top level error occurred. $error', stackTrace);
+        debugger(); // Set a breakpoint here
+      },
+    ),
     LogOptions(
       handlePrint: true,
       outputInRelease: true,

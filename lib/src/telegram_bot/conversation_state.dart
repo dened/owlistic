@@ -39,9 +39,7 @@ class Done<T extends Enum> extends Step<T> {
 /// A simple example enum for conversation steps.
 ///
 /// Replace this with your own enum specific to each conversation handler.
-enum OneStep {
-  go,
-}
+enum OneStep { go }
 
 /// A function type for creating an initial state object for a conversation.
 ///

@@ -75,17 +75,16 @@ final class TelcCertificateLookupService {
             () => _apiClient.fetchCertificateData(examinationInstituteId, examId, attendeeId),
           );
 
-          _handler
+          await _handler
               .certFound(
                 searchInfo: info,
                 link: 'https://results.telc.net/certificate/$examinationInstituteId/$examId/$attendeeId',
                 certificate: certificate,
-              )
-              .ignore();
+              );
           l.d('Certificate data: $certificate');
         } on CertInfoNotFoundException {
           l.i('Certificate not found for ${info.nummer} on ${info.examDate.toTeclFormat()}');
-          _handler.certNotFound(daysForCheck, info).ignore();
+          await _handler.certNotFound(daysForCheck, info);
         } on Object catch (error, stackTrace) {
           l.e('An error occurred while checking certificates: $error', stackTrace);
         }

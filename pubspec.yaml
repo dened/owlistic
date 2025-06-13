@@ -1,6 +1,6 @@
 name: owlistic
 description: Owlistic Bot checks results.telc.net and notifies you when your B2 Beruf certificate is online.
-version: 0.0.2
+version: 0.0.4
 repository: https://github.com/dened/owlistic
 issue_tracker: https://github.com/dened/owlistic/issues
 publish_to: none # No publishing, this is a Docker image

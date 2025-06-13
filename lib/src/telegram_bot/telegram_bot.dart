@@ -15,21 +15,17 @@ typedef OnUpdateHandler = void Function(int id, Map<String, Object?> update);
 
 /// Represents a button in an inline keyboard.
 class InlineKeyboardButton {
-  InlineKeyboardButton({
-    required this.text,
-    this.callbackData,
-    this.url,
-  });
+  InlineKeyboardButton({required this.text, this.callbackData, this.url});
 
   final String text;
   final String? callbackData;
   final String? url;
 
   Map<String, Object?> toJson() => {
-        'text': text,
-        if (callbackData != null) 'callback_data': callbackData,
-        if (url != null) 'url': url,
-      };
+    'text': text,
+    if (callbackData != null) 'callback_data': callbackData,
+    if (url != null) 'url': url,
+  };
 }
 
 /// Represents the parse mode for Telegram messages.
@@ -49,10 +45,10 @@ class TelegramBot {
     http.Client? client,
     Duration poolingTimeout = const Duration(seconds: 30),
     int? offset,
-  })  : _client = client ?? http.Client(),
-        _baseUri = Uri.parse('https://api.telegram.org/bot$token'),
-        _poolingTimeout = poolingTimeout,
-        _offset = offset ?? 0;
+  }) : _client = client ?? http.Client(),
+       _baseUri = Uri.parse('https://api.telegram.org/bot$token'),
+       _poolingTimeout = poolingTimeout,
+       _offset = offset ?? 0;
 
   final Uri _baseUri;
   final http.Client _client;
@@ -99,18 +95,20 @@ class TelegramBot {
   }) async {
     final url = _buildMethodUri('sendMessage');
     final response = await retry(
-      () => _client.post(
-        url,
-        body: _jsonEncoder.convert(<String, Object?>{
-          'chat_id': chatId,
-          'text': (autoEscapeMarkdown && parseMode == ParseMode.markdownV2) ? escapeMarkdownV2(text) : text,
-          'parse_mode': parseMode.type,
-          'disable_notification': disableNotification,
-          'protect_content': protectContent,
-          if (replyMarkup != null) 'reply_markup': replyMarkup,
-        }),
-        headers: {'Content-Type': 'application/json'},
-      ).timeout(const Duration(seconds: 12)),
+      () => _client
+          .post(
+            url,
+            body: _jsonEncoder.convert(<String, Object?>{
+              'chat_id': chatId,
+              'text': (autoEscapeMarkdown && parseMode == ParseMode.markdownV2) ? escapeMarkdownV2(text) : text,
+              'parse_mode': parseMode.type,
+              'disable_notification': disableNotification,
+              'protect_content': protectContent,
+              if (replyMarkup != null) 'reply_markup': replyMarkup,
+            }),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(const Duration(seconds: 12)),
     );
     if (response.statusCode != 200)
       switch (response.statusCode) {
@@ -145,19 +143,21 @@ class TelegramBot {
   }) async {
     final url = _buildMethodUri('editMessageText');
     final response = await retry(
-      () => _client.post(
-        url,
-        body: _jsonEncoder.convert(<String, Object?>{
-          'chat_id': chatId,
-          'message_id': messageId,
-          'text': autoEscapeMarkdown ? escapeMarkdownV2(text) : text,
-          'parse_mode': parseMode.type,
-          'disable_notification': disableNotification,
-          'protect_content': protectContent,
-          if (replyMarkup != null) 'reply_markup': replyMarkup,
-        }),
-        headers: {'Content-Type': 'application/json'},
-      ).timeout(const Duration(seconds: 12)),
+      () => _client
+          .post(
+            url,
+            body: _jsonEncoder.convert(<String, Object?>{
+              'chat_id': chatId,
+              'message_id': messageId,
+              'text': autoEscapeMarkdown ? escapeMarkdownV2(text) : text,
+              'parse_mode': parseMode.type,
+              'disable_notification': disableNotification,
+              'protect_content': protectContent,
+              if (replyMarkup != null) 'reply_markup': replyMarkup,
+            }),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(const Duration(seconds: 12)),
     );
     if (response.statusCode != 200)
       switch (response.statusCode) {
@@ -183,11 +183,13 @@ class TelegramBot {
   Future<void> deleteMessage(int chatId, int messageId) async {
     final url = _buildMethodUri('deleteMessage');
     final response = await retry(
-      () => _client.post(
-        url,
-        body: _jsonEncoder.convert({'chat_id': chatId, 'message_id': messageId}),
-        headers: {'Content-Type': 'application/json'},
-      ).timeout(const Duration(seconds: 12)),
+      () => _client
+          .post(
+            url,
+            body: _jsonEncoder.convert({'chat_id': chatId, 'message_id': messageId}),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(const Duration(seconds: 12)),
     );
     if (response.statusCode == 200 || response.statusCode == 400) return;
     l.w('Failed to delete message: status code ${response.statusCode}', StackTrace.current);
@@ -203,14 +205,16 @@ class TelegramBot {
     final length = toDelete.length;
     for (var i = 0; i < length; i += 100) {
       final response = await retry(
-        () => _client.post(
-          url,
-          body: _jsonEncoder.convert({
-            'chat_id': chatId,
-            'message_ids': toDelete.sublist(i, math.min(i + 100, length)),
-          }),
-          headers: {'Content-Type': 'application/json'},
-        ).timeout(const Duration(seconds: 12)),
+        () => _client
+            .post(
+              url,
+              body: _jsonEncoder.convert({
+                'chat_id': chatId,
+                'message_ids': toDelete.sublist(i, math.min(i + 100, length)),
+              }),
+              headers: {'Content-Type': 'application/json'},
+            )
+            .timeout(const Duration(seconds: 12)),
       );
       if (response.statusCode == 200 || response.statusCode == 400) continue;
       l.w('Failed to delete messages: status code ${response.statusCode}', StackTrace.current);
@@ -226,8 +230,9 @@ class TelegramBot {
     bool protectContent = true,
   }) async {
     final replyMarkup = <String, Object?>{
-      'inline_keyboard':
-          buttons.map((row) => row.map((button) => button.toJson()).toList(growable: false)).toList(growable: false),
+      'inline_keyboard': buttons
+          .map((row) => row.map((button) => button.toJson()).toList(growable: false))
+          .toList(growable: false),
     };
     return sendMessage(
       chatId,
@@ -246,51 +251,35 @@ class TelegramBot {
     bool oneTimeKeyboard = true,
   }) async {
     final replyMarkup = <String, Object?>{
-      'keyboard':
-          buttons.map((row) => row.map((button) => button.toJson()).toList(growable: false)).toList(growable: false),
+      'keyboard': buttons
+          .map((row) => row.map((button) => button.toJson()).toList(growable: false))
+          .toList(growable: false),
       'resize_keyboard': resizeKeyboard,
       'one_time_keyboard': oneTimeKeyboard,
     };
-    return sendMessage(
-      chatId,
-      text,
-      disableNotification: true,
-      protectContent: true,
-      replyMarkup: replyMarkup,
-    );
+    return sendMessage(chatId, text, disableNotification: true, protectContent: true, replyMarkup: replyMarkup);
   }
 
-  Future<int> sendReplyKeyboardRemove(
-    int chatId,
-    String text, {
-    bool selective = true,
-  }) async {
-    final replyMarkup = <String, Object?>{
-      'remove_keyboard': true,
-      'selective': selective,
-    };
-    return sendMessage(
-      chatId,
-      text,
-      disableNotification: true,
-      protectContent: true,
-      replyMarkup: replyMarkup,
-    );
+  Future<int> sendReplyKeyboardRemove(int chatId, String text, {bool selective = true}) async {
+    final replyMarkup = <String, Object?>{'remove_keyboard': true, 'selective': selective};
+    return sendMessage(chatId, text, disableNotification: true, protectContent: true, replyMarkup: replyMarkup);
   }
 
   /// Answer a callback query.
   Future<void> answerCallbackQuery(String callbackQueryId, String text, {bool arlert = false}) async {
     final url = _buildMethodUri('answerCallbackQuery');
     final response = await retry(
-      () => _client.post(
-        url,
-        body: _jsonEncoder.convert({
-          'callback_query_id': callbackQueryId,
-          if (text.isNotEmpty) 'text': text,
-          if (arlert) 'show_alert': arlert,
-        }),
-        headers: {'Content-Type': 'application/json'},
-      ).timeout(const Duration(seconds: 12)),
+      () => _client
+          .post(
+            url,
+            body: _jsonEncoder.convert({
+              'callback_query_id': callbackQueryId,
+              if (text.isNotEmpty) 'text': text,
+              if (arlert) 'show_alert': arlert,
+            }),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(const Duration(seconds: 12)),
     );
     if (response.statusCode == 200 || response.statusCode == 400) return;
     l.w('Failed to answer callback query: status code ${response.statusCode}', StackTrace.current);
@@ -302,35 +291,39 @@ class TelegramBot {
 
   /// Start polling for updates.
   void start({Set<String> types = const <String>{'message', 'callback_query'}}) => runZonedGuarded(
-        () {
-          stop();
-          final allowedTypes = jsonEncode(types.toList(growable: false));
-          final url = _buildMethodUri('getUpdates');
-          final poller = _poller = Completer<void>()..future.ignore();
-          Future<void>(() async {
-            while (true) {
-              try {
-                if (poller.isCompleted) return;
-                final updates = await _getUpdates(url.replace(queryParameters: {
+    () {
+      stop();
+      final allowedTypes = jsonEncode(types.toList(growable: false));
+      final url = _buildMethodUri('getUpdates');
+      final poller = _poller = Completer<void>()..future.ignore();
+      Future<void>(() async {
+        while (true) {
+          try {
+            if (poller.isCompleted) return;
+            final updates = await _getUpdates(
+              url.replace(
+                queryParameters: {
                   'allowed_updates': allowedTypes,
                   'timeout': _poolingTimeout.inSeconds.toString(),
                   'offset': _offset.toString(),
-                })).timeout(_poolingTimeout * 2);
-                if (poller.isCompleted) return;
-                _handleUpdates(updates);
-              } on TimeoutException catch (e, stackTrace) {
-                l.e('Timeout while polling for updates: $e', stackTrace);
-              } on Object catch (e, stackTrace) {
-                l.e('Error while polling for updates: $e', stackTrace);
-                await Future<void>.delayed(const Duration(seconds: 5));
-              }
-            }
-          });
-        },
-        (error, stackTrace) {
-          l.e('Error while polling for updates: $error', stackTrace);
-        },
-      );
+                },
+              ),
+            ).timeout(_poolingTimeout * 2);
+            if (poller.isCompleted) return;
+            _handleUpdates(updates);
+          } on TimeoutException catch (e, stackTrace) {
+            l.e('Timeout while polling for updates: $e', stackTrace);
+          } on Object catch (e, stackTrace) {
+            l.e('Error while polling for updates: $e', stackTrace);
+            await Future<void>.delayed(const Duration(seconds: 5));
+          }
+        }
+      });
+    },
+    (error, stackTrace) {
+      l.e('Error while polling for updates: $error', stackTrace);
+    },
+  );
 
   void stop() {
     _poller?.complete();
@@ -346,8 +339,10 @@ class TelegramBot {
           handler(update.id, update.update);
           l.d('_handleUpdates {id: ${update.id}, update: ${update.update}');
         } on Object catch (error, stackTrace) {
-          l.e('Error while handling update #${update.id}: $error', stackTrace,
-              {'id': update.id, 'update': update.update});
+          l.e('Error while handling update #${update.id}: $error', stackTrace, {
+            'id': update.id,
+            'update': update.update,
+          });
           continue;
         }
       }
@@ -357,8 +352,11 @@ class TelegramBot {
   Future<List<({int id, Map<String, Object?> update})>> _getUpdates(Uri url) async {
     final response = await _client.get(url).timeout(_poolingTimeout * 2);
     if (response.statusCode != 200) {
-      l.w('Failed to get updates: status code ${response.statusCode}', StackTrace.current,
-          _jsonDecoder.convert(response.bodyBytes));
+      l.w(
+        'Failed to get updates: status code ${response.statusCode}',
+        StackTrace.current,
+        _jsonDecoder.convert(response.bodyBytes),
+      );
       return const [];
     }
     final update = _jsonDecoder.convert(response.bodyBytes);
@@ -374,17 +372,18 @@ class TelegramBot {
     }
 
     return result
-        .whereType<Map<String, Object?>>()
-        .map<({int id, Map<String, Object?> update})>((u) => (
-              id: switch (u['update_id']) {
-                int id => id,
-                _ => -1,
-              },
-              update: u
-            ))
-        .where((u) => u.id > 0)
-        .toList(growable: false)
-      ..sort((a, b) => a.id.compareTo(b.id));
+      .whereType<Map<String, Object?>>()
+      .map<({int id, Map<String, Object?> update})>(
+        (u) => (
+          id: switch (u['update_id']) {
+            int id => id,
+            _ => -1,
+          },
+          update: u,
+        ),
+      )
+      .where((u) => u.id > 0)
+      .toList(growable: false)..sort((a, b) => a.id.compareTo(b.id));
   }
 }
 

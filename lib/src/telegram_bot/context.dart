@@ -17,21 +17,16 @@ class Context {
     required TelegramBot bot,
     required Database db,
     required Localization ln,
-  })  : _rawUpdate = update,
-        _bot = bot,
-        _db = db,
-        _ln = ln {
+  }) : _rawUpdate = update,
+       _bot = bot,
+       _db = db,
+       _ln = ln {
     // Store the raw update, bot, and database instances.
     if (update case {'message': final Map<String, Object?> msg}) {
       _msg = msg;
-    } else if (update
-        case {
-          'callback_query': {
-            'message': final Map<String, Object?> msg,
-            'data': final String data,
-            'id': final String id,
-          }
-        }) {
+    } else if (update case {
+      'callback_query': {'message': final Map<String, Object?> msg, 'data': final String data, 'id': final String id},
+    }) {
       _msg = msg;
       _callbackId = id;
       _callbackData = data;
@@ -41,12 +36,8 @@ class Context {
     }
 
     if (_msg
-        // Further parse the extracted message (_msg) for common fields.
-        case {
-          'message_id': final int id,
-          'chat': final Map<String, Object?> chat,
-          'text': final String? text,
-        }) {
+    // Further parse the extracted message (_msg) for common fields.
+    case {'message_id': final int id, 'chat': final Map<String, Object?> chat, 'text': final String? text}) {
       _messageId = id;
       _chat = chat;
       _text = text;
@@ -65,7 +56,6 @@ class Context {
       {'from': {'language_code': final String languageCode}} => languageCode,
       _ => null,
     };
-
 
     // Parse bot commands from the message text.
     _commands = _parseCommands();
@@ -101,7 +91,6 @@ class Context {
   /// The language code of the chat.
   String? _languageCode;
 
-
   /// The ID of the callback query, if the update is a callback query.
   late String _callbackId;
 
@@ -119,16 +108,15 @@ class Context {
 
   /// Gets the ID of the callback query.
   String get callbackId => _callbackId;
-  
+
   /// Gets the 'chat' object from the message.
   Map<String, Object?> get chat => _chat;
 
   /// Gets the ID of the chat.
   int get chatId => _chatId;
 
-  /// Gets the language code of the chat. 
+  /// Gets the language code of the chat.
   String? get languageCode => _languageCode;
-
 
   /// Gets the list of bot commands found in the message.
   List<String>? get commands => _commands;
@@ -150,7 +138,6 @@ class Context {
 
   /// Gets the text content of the message.
   String? get text => _text;
-
 
   Map<String, String?>? getArgs() {
     final txt = text;
@@ -187,20 +174,24 @@ class Context {
 
     // Use pattern matching on the 'entities' field of the message.
     return switch (_msg['entities']) {
-      List<dynamic> list => list
+      List<dynamic> list =>
+        list
             // Filter for elements that are maps (representing entities).
             .whereType<Map<String, Object?>>()
             // Further filter for maps that represent a 'bot_command'.
-            .where((map) => switch (map) {
-                  {'type': 'bot_command', 'offset': int _, 'length': int _} => true,
-                  _ => false,
-                })
+            .where(
+              (map) => switch (map) {
+                {'type': 'bot_command', 'offset': int _, 'length': int _} => true,
+                _ => false,
+              },
+            )
             // For each valid 'bot_command' entity, extract the command text.
             .map((map) {
-          final offset = map['offset'] as int;
-          final length = map['length'] as int;
-          return text.substring(offset, offset + length);
-        }).toList(),
+              final offset = map['offset'] as int;
+              final length = map['length'] as int;
+              return text.substring(offset, offset + length);
+            })
+            .toList(),
       // If 'entities' is not a list or is null, return null.
       _ => null,
     };

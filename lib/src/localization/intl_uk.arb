@@ -12,6 +12,21 @@
     "type": "text",
     "placeholders": {}
   },
+   "langUkrainian1": "Ukrainian",
+  "@langUkrainian1": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "langUkrainian2": "Ukrainian",
+  "@langUkrainian2": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "langUkrainian3": "Ukrainian",
+  "@langUkrainian3": {
+    "type": "text",
+    "placeholders": {}
+  },
   "declineButtonText": "❌ Відхилити",
   "@declineButtonText": {
     "description": "Text for the decline button.",

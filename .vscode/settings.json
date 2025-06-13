@@ -70,6 +70,7 @@
     "messages_all.dart": "messages_*.dart"
   },
   "files.associations": {
-    "*.drift": "sql"
+    "*.drift": "sql",
+    "*.arb": "jsonc"
   }
 }

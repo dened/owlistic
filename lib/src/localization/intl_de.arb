@@ -68,7 +68,13 @@
     "type": "text",
     "placeholders": {}
   },
-  "consentGivenMessage": "Vielen Dank für Ihre Zustimmung! Sie können jetzt alle Bot-Funktionen nutzen.",
+  "startWelcomeMessage": "👋 Willkommen beim telc Zertifikat-Checker-Bot!\n\nDieser Bot hilft Ihnen, Ihre telc Prüfungsergebnisse schnell und einfach zu überprüfen.\n\nUm Ihre Prüfungsdaten hinzuzufügen, verwenden Sie den Befehl /add.\nSie können Ihre gespeicherten Daten auch mit /show anzeigen, mit /delete löschen oder die Einwilligung widerrufen und alle Ihre Daten mit /delete_me löschen.\n\n",
+  "@startWelcomeMessage": {
+    "description": "Willkommensnachricht, die angezeigt wird, wenn der Bot startet.",
+    "type": "text",
+    "placeholders": {}
+  },
+  "consentGivenMessage": "Vielen Dank für Ihre Zustimmung! Sie können nun alle Bot-Funktionen nutzen.\nUm Ihre Prüfungsdaten hinzuzufügen, verwenden Sie den Befehl /add.",
   "@consentGivenMessage": {
     "description": "Message shown when user agrees to privacy policy.",
     "type": "text",

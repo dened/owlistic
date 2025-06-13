@@ -124,3 +124,9 @@ dart compile exe bin/owlistic.dart -o owlistic.run
 dart compile exe bin/lookup_service.dart -o lookup_service.run
 ```
 
+### 🐋 How to Docker
+
+```sh
+docker build -t owlistic:latest .
+docker compose up
+```

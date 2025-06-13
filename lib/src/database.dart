@@ -52,13 +52,9 @@ class Database extends _$Database
     with _DatabaseSearchInfoMixin, _DatabaseKeyValueMixin, _UserInfoMixin
     implements IKeyValueStorage {
   Database.lazy({String? path, bool logStatements = false, bool dropDatabase = false})
-      : super(LazyDatabase(
-          () => _createQueryExecutor(
-            path: path,
-            logStatements: logStatements,
-            dropDatabase: dropDatabase,
-          ),
-        ));
+    : super(
+        LazyDatabase(() => _createQueryExecutor(path: path, logStatements: logStatements, dropDatabase: dropDatabase)),
+      );
 
   static Future<QueryExecutor> _createQueryExecutor({
     String? path,
@@ -110,9 +106,7 @@ class Database extends _$Database
 
 @immutable
 class DatabaseMigrationStrategy implements MigrationStrategy {
-  const DatabaseMigrationStrategy({
-    required Database db,
-  }) : _db = db;
+  const DatabaseMigrationStrategy({required Database db}) : _db = db;
 
   /// Database to use for migrations.
   final Database _db;
@@ -120,8 +114,8 @@ class DatabaseMigrationStrategy implements MigrationStrategy {
   /// Executes when the database is created for the first time.
   @override
   OnCreate get onCreate => (migrator) async {
-        await migrator.createAll();
-      };
+    await migrator.createAll();
+  };
 
   /// Executes after the database is ready to be used (ie. it has been opened
   /// and all migrations ran), but before any other queries will be sent. This
@@ -129,18 +123,18 @@ class DatabaseMigrationStrategy implements MigrationStrategy {
   /// created or set sqlite `PRAGMAS` that you need.
   @override
   OnBeforeOpen get beforeOpen => (details) async {
-        await _db.customStatement('PRAGMA foreign_keys = ON;');
-      };
+    await _db.customStatement('PRAGMA foreign_keys = ON;');
+  };
 
   /// Executes when the database has been opened previously, but the last access
   /// happened at a different [GeneratedDatabase.schemaVersion].
   /// Schema version upgrades and downgrades will both be run here.
   @override
   OnUpgrade get onUpgrade => (m, from, to) async {
-        if (from == to) return;
-        await _db.customStatement('PRAGMA foreign_keys = OFF;');
-        return _update(_db, m, from, to);
-      };
+    if (from == to) return;
+    await _db.customStatement('PRAGMA foreign_keys = OFF;');
+    return _update(_db, m, from, to);
+  };
 
   /// https://drift.simonbinder.eu/migrations/
   static Future<void> _update(Database db, Migrator m, int from, int to) async {
@@ -157,9 +151,11 @@ class DatabaseMigrationStrategy implements MigrationStrategy {
 
         /// Enable foreign key checking to delete records from [db.certification]
         /// and delete records
-        await db.customStatement('PRAGMA foreign_keys = ON; '
-            'DELETE FROM search_info WHERE is_deleted = 1; '
-            'PRAGMA foreign_keys = OFF;');
+        await db.customStatement(
+          'PRAGMA foreign_keys = ON; '
+          'DELETE FROM search_info WHERE is_deleted = 1; '
+          'PRAGMA foreign_keys = OFF;',
+        );
 
         /// update the [db.searchInfo] table
         await m.alterTable(TableMigration(db.searchInfo));
@@ -186,19 +182,19 @@ mixin _DatabaseKeyValueMixin on _$Database implements IKeyValueStorage {
   final Map<String, Object> _cache = <String, Object>{};
 
   static KvTableCompanion? _kvCompanionFromKeyValue(String key, Object? value) => switch (value) {
-        int vint => KvTableCompanion.insert(k: key, vint: Value(vint)),
-        double vfloat => KvTableCompanion.insert(k: key, vfloat: Value(vfloat)),
-        String vstring => KvTableCompanion.insert(k: key, vstring: Value(vstring)),
-        bool vbool => KvTableCompanion.insert(k: key, vbool: Value(vbool ? 1 : 0)),
-        _ => null,
-      };
+    int vint => KvTableCompanion.insert(k: key, vint: Value(vint)),
+    double vfloat => KvTableCompanion.insert(k: key, vfloat: Value(vfloat)),
+    String vstring => KvTableCompanion.insert(k: key, vstring: Value(vstring)),
+    bool vbool => KvTableCompanion.insert(k: key, vbool: Value(vbool ? 1 : 0)),
+    _ => null,
+  };
   @override
   Future<void> refresh() => select(kvTable).get().then((value) {
-        _isInitialized = true;
-        _cache
-          ..clear()
-          ..addAll(<String, Object>{for (final kv in value) kv.k: kv.vstring ?? kv.vint ?? kv.vfloat ?? kv.vbool == 1});
-      });
+    _isInitialized = true;
+    _cache
+      ..clear()
+      ..addAll(<String, Object>{for (final kv in value) kv.k: kv.vstring ?? kv.vint ?? kv.vfloat ?? kv.vbool == 1});
+  });
 
   @override
   T? getKey<T extends Object>(String key) {
@@ -244,9 +240,9 @@ mixin _DatabaseKeyValueMixin on _$Database implements IKeyValueStorage {
     return keys == null
         ? Map<String, Object>.of(_cache)
         : <String, Object>{
-            for (final e in _cache.entries)
-              if (keys.contains(e.key)) e.key: e.value,
-          };
+          for (final e in _cache.entries)
+            if (keys.contains(e.key)) e.key: e.value,
+        };
   }
 
   @override
@@ -255,22 +251,26 @@ mixin _DatabaseKeyValueMixin on _$Database implements IKeyValueStorage {
     if (data.isEmpty) return;
 
     final entries = <(String, Object?, KvTableCompanion?)>[
-      for (final entry in data.entries) (entry.key, entry.value, _kvCompanionFromKeyValue(entry.key, entry.value))
+      for (final entry in data.entries) (entry.key, entry.value, _kvCompanionFromKeyValue(entry.key, entry.value)),
     ];
     final toDelete = entries.where((e) => e.$3 == null).map<String>((e) => e.$1).toSet();
-    final toInsert = entries.expand<(String, Object, KvTableCompanion)>((e) sync* {
-      final value = e.$2;
-      final companion = e.$3;
-      if (companion == null || value == null) return;
-      yield (e.$1, value, companion);
-    }).toList();
+    final toInsert =
+        entries.expand<(String, Object, KvTableCompanion)>((e) sync* {
+          final value = e.$2;
+          final companion = e.$3;
+          if (companion == null || value == null) return;
+          yield (e.$1, value, companion);
+        }).toList();
 
     for (final key in toDelete) _cache.remove(key);
     _cache.addAll(<String, Object>{for (final e in toInsert) e.$1: e.$2});
 
-    batch((b) => b
-      ..deleteWhere(kvTable, (tbl) => tbl.k.isIn(toDelete))
-      ..insertAllOnConflictUpdate(kvTable, toInsert.map((e) => e.$3).toList(growable: false))).ignore();
+    batch(
+      (b) =>
+          b
+            ..deleteWhere(kvTable, (tbl) => tbl.k.isIn(toDelete))
+            ..insertAllOnConflictUpdate(kvTable, toInsert.map((e) => e.$3).toList(growable: false)),
+    ).ignore();
   }
 
   @override
@@ -292,48 +292,32 @@ mixin _UserInfoMixin on _$Database {
 
   /// Saves user information into the database.
   /// If the user already exists, it will update the existing record.
-  void saveUser({
-    required int id,
-    String? languageCode,
-  }) {
-    // Implement the logic to save user data into the database
-    into(user)
-        .insertOnConflictUpdate(UserCompanion(
-          id: Value(id),
-          languageCode: Value(_normolizeLanguageCode(languageCode)),
-        ))
-        .ignore();
-  }
+  Future<int> saveUser({required int id, String? languageCode}) => into(user).insertOnConflictUpdate(
+    UserCompanion(
+      id: Value(id),
+      languageCode: Value(_normolizeLanguageCode(languageCode)),
+      deletedAt: const Value<int?>(null), // Use null for not deleted
+    ),
+  );
 
   /// soft remove user by chat ID.
-  void removeUserById(int chatId) {
+  Future<void> removeUserById(int chatId) async {
     /// Perform a soft delete of the user to preserve relationships in the user_consent table
-    (update(user)..where((tbl) => tbl.id.equals(chatId)))
-        .write(UserCompanion(
-          deletedAt: Value(DateTime.now().secondsSinceEpoch),
-        ))
-        .ignore();
+    await (update(user)..where((tbl) => tbl.id.equals(chatId))).write(
+      UserCompanion(languageCode: const Value<String?>(null), deletedAt: Value(DateTime.now().secondsSinceEpoch)),
+    );
 
     /// search data can be completely deleted
-    (delete(searchInfo)..where((tbl) => tbl.userId.equals(chatId))).go().ignore();
+    await (delete(searchInfo)..where((tbl) => tbl.userId.equals(chatId))).go();
 
     // update revoked_at
-    (update(userConsent)..where((tbl) => tbl.userId.equals(chatId)))
-        .write(UserConsentCompanion(revokedAt: Value(DateTime.now().secondsSinceEpoch)))
-        .ignore();
-  }
+    await (update(userConsent)..where(
+      (tbl) => tbl.userId.equals(chatId) & tbl.revokedAt.isNull(),
+    )).write(UserConsentCompanion(revokedAt: Value(DateTime.now().secondsSinceEpoch)));
 
-  /// Returns the locale for the given chat ID.
-  /// If the locale is not found in the cache, it retrieves it from the database
-  /// and caches it for future use.
-  FutureOr<String> getUserLocale(int chatId) async {
-    assert(chatId > 0, 'Chat ID must be greater than 0');
-    final cachedLocale = _cacheLocale[chatId];
-    if (cachedLocale != null) return cachedLocale;
-
-    final locale = await (select(user)..where((tbl) => tbl.id.equals(chatId))).map((u) => u.languageCode).getSingle();
-    _cacheLocale[chatId] = locale!;
-    return locale;
+    // Clear the cache for the user locale and consent
+    _cacheLocale.remove(chatId);
+    _cacheConsent.remove(chatId);
   }
 
   /// Normalizes the language code to ensure it is one of the supported locales.
@@ -347,11 +331,11 @@ mixin _UserInfoMixin on _$Database {
     return defaultLocale;
   }
 
-  void saveUserLanguageCode(int chatId, String languageCode) {
+  Future<int> saveUserLanguageCode(int chatId, String languageCode) {
     _cacheLocale[chatId] = languageCode;
-    (update(user)..where((tbl) => tbl.id.equals(chatId))).write(UserCompanion(
-      languageCode: Value<String?>(_normolizeLanguageCode(languageCode)),
-    ));
+    return (update(user)..where(
+      (tbl) => tbl.id.equals(chatId),
+    )).write(UserCompanion(languageCode: Value<String?>(_normolizeLanguageCode(languageCode))));
   }
 
   /// Gets the language code for a given user.
@@ -363,7 +347,9 @@ mixin _UserInfoMixin on _$Database {
     if (cachedCode != null) return cachedCode;
 
     final code =
-        await (select(user)..where((tbl) => tbl.id.equals(chatId))).map((u) => u.languageCode).getSingleOrNull();
+        await (select(
+          user,
+        )..where((tbl) => tbl.id.equals(chatId) & tbl.deletedAt.isNull())).map((u) => u.languageCode).getSingleOrNull();
     if (code != null) {
       _cacheLocale[chatId] = code;
     }
@@ -373,21 +359,23 @@ mixin _UserInfoMixin on _$Database {
 
   /// Saves the user's consent to the privacy policy.
   /// This updates the user's record with the consent text and a timestamp.
-  void saveUserConsent({required int userId, required String consentText}) {
+  Future<int> saveUserConsent({required int userId, required String consentText}) async {
     // Implement the logic to save user data into the database
-    into(userConsent).insertOnConflictUpdate(UserConsentCompanion(
-      userId: Value(userId),
-      consentText: Value(consentText),
-    ));
+    final count = await into(
+      userConsent,
+    ).insertOnConflictUpdate(UserConsentCompanion(userId: Value(userId), consentCallback: Value(consentText)));
     _cacheConsent[userId] = true;
+
+    return count;
   }
 
   /// Checks if the user has given consent to the privacy policy.
   FutureOr<bool> hasUserConsent(int chatId) async {
     assert(chatId > 0, 'Chat ID must be greater than 0');
     if (!_cacheConsent.containsKey(chatId)) {
-      final result = await (select(userConsent)..where((tbl) => tbl.userId.equals(chatId) & tbl.revokedAt.isNull()))
-          .getSingleOrNull();
+      final result =
+          await (select(userConsent)
+            ..where((tbl) => tbl.userId.equals(chatId) & tbl.revokedAt.isNull())).getSingleOrNull();
       _cacheConsent[chatId] = result != null;
     }
 
@@ -396,31 +384,28 @@ mixin _UserInfoMixin on _$Database {
 }
 
 mixin _DatabaseSearchInfoMixin on _$Database {
-  void saveSearchInfo({
+  Future<int> saveSearchInfo({
     required int chatId,
     required String attendeeNumber,
     required DateTime birthDate,
     required DateTime examDate,
-  }) {
-    into(searchInfo)
-        .insertOnConflictUpdate(
-          SearchInfoCompanion.insert(
-            userId: chatId,
-            attendeeNumber: attendeeNumber,
-            birthDate: birthDate.secondsSinceEpoch,
-            examDate: examDate.secondsSinceEpoch,
-          ),
-        )
-        .ignore();
-  }
+  }) => into(searchInfo).insertOnConflictUpdate(
+    SearchInfoCompanion.insert(
+      userId: chatId,
+      attendeeNumber: attendeeNumber,
+      birthDate: birthDate.secondsSinceEpoch,
+      examDate: examDate.secondsSinceEpoch,
+    ),
+  );
 
   /// Get search info by userId ID and isRemoved == false
   /// Returns a list of [SearchInfoData] for the given chat ID.
   Future<List<m.SearchInfo>> getSearchInfo(int chatId) async {
-    final query = select(searchInfo)
-      ..where((tbl) =>
+    final query = select(searchInfo)..where(
+      (tbl) =>
           tbl.userId.equals(chatId) &
-          notExistsQuery(select(certification)..where((cert) => cert.searchInfoId.equalsExp(tbl.id))));
+          notExistsQuery(select(certification)..where((cert) => cert.searchInfoId.equalsExp(tbl.id))),
+    );
 
     return query.map((s) => s.toSearchInfo()).get();
   }
@@ -429,11 +414,14 @@ mixin _DatabaseSearchInfoMixin on _$Database {
   /// and for which there are no associated certifications.
   /// This method orders the results by userId in ascending order.
   Future<List<m.SearchInfo>> getAllSearchInfo() async {
-    final query = select(searchInfo)
-      ..where((tbl) =>
-          tbl.isValid.equals(1) &
-          notExistsQuery(select(certification)..where((cert) => cert.searchInfoId.equalsExp(tbl.id))))
-      ..orderBy([(u) => OrderingTerm(expression: u.userId, mode: OrderingMode.asc)]);
+    final query =
+        select(searchInfo)
+          ..where(
+            (tbl) =>
+                tbl.isValid.equals(1) &
+                notExistsQuery(select(certification)..where((cert) => cert.searchInfoId.equalsExp(tbl.id))),
+          )
+          ..orderBy([(u) => OrderingTerm(expression: u.userId, mode: OrderingMode.asc)]);
 
     return query.map((s) => s.toSearchInfo()).get();
   }
@@ -455,21 +443,23 @@ mixin _DatabaseSearchInfoMixin on _$Database {
     required String link,
     required CertificateEntity entity,
   }) async {
-    await into(certification).insert(CertificationCompanion(
-      searchInfoId: Value(searchInfoId),
-      link: Value(link),
-      data: Value(jsonEncode(entity.toJson())),
-    ));
+    await into(certification).insert(
+      CertificationCompanion(
+        searchInfoId: Value(searchInfoId),
+        link: Value(link),
+        data: Value(jsonEncode(entity.toJson())),
+      ),
+    );
   }
 }
 
 extension SearchInfoDataExtension on SearchInfoData {
   /// Converts this [SearchInfoData] to a [m.SearchInfo] object.
   m.SearchInfo toSearchInfo() => m.SearchInfo(
-        id: id,
-        chatId: userId,
-        nummer: attendeeNumber,
-        examDate: DateTime.fromMillisecondsSinceEpoch(examDate * 1000),
-        birthDate: DateTime.fromMillisecondsSinceEpoch(birthDate * 1000),
-      );
+    id: id,
+    chatId: userId,
+    nummer: attendeeNumber,
+    examDate: DateTime.fromMillisecondsSinceEpoch(examDate * 1000),
+    birthDate: DateTime.fromMillisecondsSinceEpoch(birthDate * 1000),
+  );
 }

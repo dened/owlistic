@@ -5,9 +5,10 @@ CREATE TABLE
         --req user_id
         user_id INTEGER NOT NULL REFERENCES user (id) ON DELETE RESTRICT,
         --req consent_text_id
-        consent_text TEXT,
+        consent_callback TEXT,
         --req meta_created_at unixtime
         meta_created_at INTEGER NOT NULL DEFAULT (strftime ('%s', 'now')), 
         --revoked_at unixtime
-        revoked_at INTEGER 
+        revoked_at INTEGER,
+        CONSTRAINT consent_text_user_id_unique UNIQUE (user_id, consent_callback, revoked_at)
     ) STRICT;

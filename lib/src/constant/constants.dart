@@ -61,7 +61,7 @@ const bool kDebugMode = !kReleaseMode && !kProfileMode;
 const String updateIdKey = 'last_update_id_key';
 
 // How many days back to check for the certificate
-const int defaultCountDaysForCheck = 15;
+const int defaultCountDaysForCheck = 10;
 
 
 final dateFormat = DateFormat('dd.MM.yyyy');

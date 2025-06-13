@@ -10,9 +10,8 @@ import 'package:drift/src/runtime/executor/stream_queries.dart' as _i4;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i6;
 import 'package:owlistic/owlistic.dart' as _i3;
-import 'package:owlistic/src/dto/cetrificate_entity.dart' as _i8;
+import 'package:owlistic/src/dto/certificate_entity.dart' as _i8;
 import 'package:owlistic/src/dto/search_info.dart' as _i7;
-import 'package:owlistic/src/localization/localization.dart' as _i9;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -1600,17 +1599,98 @@ class MockDatabase extends _i1.Mock implements _i3.Database {
 /// A class which mocks [Localization].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockLocalization extends _i1.Mock implements _i9.Localization {
+class MockLocalization extends _i1.Mock implements _i3.Localization {
   MockLocalization() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  String get helpText => (super.noSuchMethod(
-        Invocation.getter(#helpText),
+  String get helpListHeader => (super.noSuchMethod(
+        Invocation.getter(#helpListHeader),
         returnValue: _i6.dummyValue<String>(
           this,
-          Invocation.getter(#helpText),
+          Invocation.getter(#helpListHeader),
+        ),
+      ) as String);
+
+  @override
+  String get helpCommandDescription => (super.noSuchMethod(
+        Invocation.getter(#helpCommandDescription),
+        returnValue: _i6.dummyValue<String>(
+          this,
+          Invocation.getter(#helpCommandDescription),
+        ),
+      ) as String);
+
+  @override
+  String get startCommandDescription => (super.noSuchMethod(
+        Invocation.getter(#startCommandDescription),
+        returnValue: _i6.dummyValue<String>(
+          this,
+          Invocation.getter(#startCommandDescription),
+        ),
+      ) as String);
+
+  @override
+  String get checkNowCommandDescription => (super.noSuchMethod(
+        Invocation.getter(#checkNowCommandDescription),
+        returnValue: _i6.dummyValue<String>(
+          this,
+          Invocation.getter(#checkNowCommandDescription),
+        ),
+      ) as String);
+
+  @override
+  String get languageCommandDescription => (super.noSuchMethod(
+        Invocation.getter(#languageCommandDescription),
+        returnValue: _i6.dummyValue<String>(
+          this,
+          Invocation.getter(#languageCommandDescription),
+        ),
+      ) as String);
+
+  @override
+  String get addCommandDescription => (super.noSuchMethod(
+        Invocation.getter(#addCommandDescription),
+        returnValue: _i6.dummyValue<String>(
+          this,
+          Invocation.getter(#addCommandDescription),
+        ),
+      ) as String);
+
+  @override
+  String get showCommandDescription => (super.noSuchMethod(
+        Invocation.getter(#showCommandDescription),
+        returnValue: _i6.dummyValue<String>(
+          this,
+          Invocation.getter(#showCommandDescription),
+        ),
+      ) as String);
+
+  @override
+  String get deleteCommandDescription => (super.noSuchMethod(
+        Invocation.getter(#deleteCommandDescription),
+        returnValue: _i6.dummyValue<String>(
+          this,
+          Invocation.getter(#deleteCommandDescription),
+        ),
+      ) as String);
+
+  @override
+  String get deleteMeCommandDescription => (super.noSuchMethod(
+        Invocation.getter(#deleteMeCommandDescription),
+        returnValue: _i6.dummyValue<String>(
+          this,
+          Invocation.getter(#deleteMeCommandDescription),
+        ),
+      ) as String);
+
+  @override
+  String get startWelcomeMessage => (super.noSuchMethod(
+        Invocation.getter(#startWelcomeMessage),
+        returnValue: _i6.dummyValue<String>(
+          this,
+          Invocation.getter(#startWelcomeMessage),
         ),
       ) as String);
 

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io' as io;
 
 import 'package:l/l.dart';
@@ -31,7 +32,6 @@ Future<void> main(List<String> args) async {
 
 /// Handles the command line arguments.
 Future<T?> shutdownHandler<T extends Object?>([final Future<T> Function()? onShutdown]) {
-  //StreamSubscription<String>? userKeySub;
   StreamSubscription<io.ProcessSignal>? sigIntSub;
   StreamSubscription<io.ProcessSignal>? sigTermSub;
   final shutdownCompleter = Completer<T>.sync();
@@ -43,7 +43,6 @@ Future<T?> shutdownHandler<T extends Object?>([final Future<T> Function()? onShu
       l.i('Received signal "$signal" - closing');
       T? result;
       try {
-        //userKeySub?.cancel();
         sigIntSub?.cancel().ignore();
         sigTermSub?.cancel().ignore();
         result = await onShutdown?.call().catchError((Object error, StackTrace stackTrace) {
@@ -96,12 +95,24 @@ void Function(int updateId, Map<String, Object?> update) handler({required Depen
         '/start',
         (ln) => ln.startCommandDescription,
         (ctx, state) async {
-          // Send the language selection prompt with an inline keyboard.
-          await ctx.bot.sendInlineKeyboard(
-            ctx.chatId,
-            ln.startBotWith,
-            ln.privacyPolicyKeyboard(dp.arguments.privacyPolicyUrl),
-          );
+          final hasConsent = await ctx.db.hasUserConsent(ctx.chatId);
+          if (hasConsent) {
+            // If the user has already given consent, proceed to the next step.
+            await ctx.bot.sendMessage(ctx.chatId, ln.startWelcomeMessage);
+            return const Done();
+          }
+
+          /// Keyboard for privacy policy consent.
+          /// The URL for the privacy policy should be replaced with the actual URL.
+          final privacyPolicyKeyboard = [
+            [
+              InlineKeyboardButton(text: ln.agreeButtonText, callbackData: 'consent_agree'),
+              InlineKeyboardButton(text: ln.declineButtonText, callbackData: 'consent_decline'),
+            ],
+            [InlineKeyboardButton(text: ln.privacyPolicyButtonText, url: dp.arguments.privacyPolicyUrl)],
+          ];
+
+          await ctx.bot.sendInlineKeyboard(ctx.chatId, ln.startBotWith, privacyPolicyKeyboard);
           return const NextStep(OneStep.go);
         },
         steps: {
@@ -111,8 +122,8 @@ void Function(int updateId, Map<String, Object?> update) handler({required Depen
 
             if (callbackData == 'consent_agree') {
               // Initialize the Telegram bot and register the main update handler.
-              ctx.db.saveUser(id: ctx.chatId, languageCode: ctx.languageCode);
-              ctx.db.saveUserConsent(userId: ctx.chatId, consentText: ln.startBotWith);
+              await ctx.db.saveUser(id: ctx.chatId, languageCode: ctx.languageCode);
+              await ctx.db.saveUserConsent(userId: ctx.chatId, consentText: jsonEncode(ctx.rawUpdate));
               await ctx.bot.answerCallbackQuery(ctx.callbackId, '');
               await ctx.bot.editMessageText(ctx.chatId, ctx.messageId, ln.consentGivenMessage);
             } else if (callbackData == 'consent_decline') {
@@ -131,9 +142,9 @@ void Function(int updateId, Map<String, Object?> update) handler({required Depen
         final messageId = await ctx.bot.sendMessage(ctx.chatId, ln.checkNowStart);
         // Attempt to parse 'checkDays' argument, if provided.
         final checkDays = int.tryParse(ctx.getArgs()?['/check_now'] ?? '');
-        await ExternalLookupService.run(ctx.chatId, checkDays: checkDays);
-        // Delete the "Starting results check..." message after a delay.
-        Future.delayed(const Duration(seconds: 5), () => ctx.bot.deleteMessage(ctx.chatId, messageId));
+        await runExternalLookupService(ctx.chatId, checkDays: checkDays);
+        // Delete the "Starting results check..."
+        await bot.deleteMessage(ctx.chatId, messageId);
       }, guards: [ConsentGuard()]),
     )
     // Conversation handler for the /language command.
@@ -143,7 +154,18 @@ void Function(int updateId, Map<String, Object?> update) handler({required Depen
         (ln) => ln.languageCommandDescription,
         (ctx, state) async {
           // Send the language selection prompt with an inline keyboard.
-          await ctx.bot.sendInlineKeyboard(ctx.chatId, ln.languageSelectPompt, ln.languageSelectionKeyboard);
+
+          final languageSelectionKeyboard = [
+            [
+              InlineKeyboardButton(text: ln.langEnglish, callbackData: 'en'),
+              InlineKeyboardButton(text: ln.langGerman, callbackData: 'de'),
+            ],
+            [
+              InlineKeyboardButton(text: ln.langRussian, callbackData: 'ru'),
+              InlineKeyboardButton(text: ln.langUkrainian, callbackData: 'uk'),
+            ],
+          ];
+          await ctx.bot.sendInlineKeyboard(ctx.chatId, ln.languageSelectPompt, languageSelectionKeyboard);
           return const NextStep(OneStep.go);
         },
         steps: {
@@ -155,7 +177,7 @@ void Function(int updateId, Map<String, Object?> update) handler({required Depen
               return const Done();
             }
 
-            ctx.db.saveUserLanguageCode(ctx.chatId, languageCode);
+            await ctx.db.saveUserLanguageCode(ctx.chatId, languageCode);
 
             /// Since the user's language code has just been saved,
             /// we use `ln.withChatId` to ensure the callback message is localized correctly in the user's selected language.
@@ -332,7 +354,7 @@ void Function(int updateId, Map<String, Object?> update) handler({required Depen
             final value = ctx.callbackData ?? '';
             await ctx.bot.answerCallbackQuery(ctx.callbackId, '');
             if (value == 'delete_me_confirm_yes') {
-              ctx.db.removeUserById(ctx.chatId);
+              await ctx.db.removeUserById(ctx.chatId);
               await ctx.bot.editMessageText(ctx.chatId, ctx.messageId, ln.deleteMeSuccessMessage);
               return const Done();
             }
@@ -380,7 +402,7 @@ Future<void> _saveAndNotifySuccess(
   String birthDate,
   String examDate,
 ) async {
-  ctx.db.saveSearchInfo(
+  await ctx.db.saveSearchInfo(
     chatId: ctx.chatId,
     attendeeNumber: number,
     birthDate: dateFormat.parse(birthDate),

@@ -47,7 +47,7 @@ class MessageLookup extends MessageLookupByLibrary {
     'checkNowCommandDescription': MessageLookupByLibrary.simpleMessage('Jetzt nach Ergebnissen suchen'),
     'checkNowStart': MessageLookupByLibrary.simpleMessage('Ergebnisprüfung wird gestartet...'),
     'consentDeclinedMessage': MessageLookupByLibrary.simpleMessage('Sie haben die Bedingungen abgelehnt. Um den Bot nutzen zu können, müssen Sie der Datenschutzrichtlinie zustimmen. Sie können den Bot mit /start neu starten, um die Bedingungen erneut anzuzeigen.'),
-    'consentGivenMessage': MessageLookupByLibrary.simpleMessage('Vielen Dank für Ihre Zustimmung! Sie können jetzt alle Bot-Funktionen nutzen.'),
+    'consentGivenMessage': MessageLookupByLibrary.simpleMessage('Vielen Dank für Ihre Zustimmung! Sie können nun alle Bot-Funktionen nutzen.\nUm Ihre Prüfungsdaten hinzuzufügen, verwenden Sie den Befehl /add.'),
     'declineButtonText': MessageLookupByLibrary.simpleMessage('❌ Ablehnen'),
     'deleteAllSuccessCallback': MessageLookupByLibrary.simpleMessage('Alle Einträge erfolgreich gelöscht.'),
     'deleteButtonDeleteAll': MessageLookupByLibrary.simpleMessage('Alles löschen'),
@@ -77,6 +77,7 @@ class MessageLookup extends MessageLookupByLibrary {
     'showListHeader': MessageLookupByLibrary.simpleMessage('Liste der hinzugefügten Einträge:\n'),
     'showNoData': MessageLookupByLibrary.simpleMessage('Noch keine Daten hinzugefügt. Verwenden Sie /add, um neue Einträge hinzuzufügen.'),
     'startBotWith': MessageLookupByLibrary.simpleMessage('👋 Willkommen beim telc Zertifikat-Checker-Bot!\n\nFür meinen Betrieb werde ich einige Daten sammeln und verarbeiten:\n*   Ihre Telegram-Daten: ID, Sprachcode – zur Identifizierung und Kommunikation.\n*   Daten für die Zertifikatssuche: Prüfungsteilnehmernummer, Geburtsdatum und Prüfungsdatum. Diese Daten geben Sie selbst ein.\n\n📄 Gefundene Zertifikatsinformationen (z.B. \"B2 Beruf\") werden im System gespeichert. Die Aufbewahrungsfrist für solche Daten beträgt nicht mehr als 12 Monate.\n\n⚠️ Wichtig!\nSie können Daten eingeben, um das Zertifikat einer anderen Person zu suchen. Indem Sie solche Daten bereitstellen, bestätigen Sie, dass Sie alle erforderlichen Berechtigungen (z.B. Zustimmung dieser Person) für deren Verarbeitung über den Bot für die angegebenen Zwecke haben.\n\nIndem Sie auf die Schaltfläche \"Zustimmen\" klicken, bestätigen Sie Ihre Annahme unserer Datenschutzrichtlinie\n'),
-    'startCommandDescription': MessageLookupByLibrary.simpleMessage('Den Bot starten und die Datenschutzrichtlinie akzeptieren')
+    'startCommandDescription': MessageLookupByLibrary.simpleMessage('Den Bot starten und die Datenschutzrichtlinie akzeptieren'),
+    'startWelcomeMessage': MessageLookupByLibrary.simpleMessage('👋 Willkommen beim telc Zertifikat-Checker-Bot!\n\nDieser Bot hilft Ihnen, Ihre telc Prüfungsergebnisse schnell und einfach zu überprüfen.\n\nUm Ihre Prüfungsdaten hinzuzufügen, verwenden Sie den Befehl /add.\nSie können Ihre gespeicherten Daten auch mit /show anzeigen, mit /delete löschen oder die Einwilligung widerrufen und alle Ihre Daten mit /delete_me löschen.\n\n')
   };
 }

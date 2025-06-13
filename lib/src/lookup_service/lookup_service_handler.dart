@@ -49,7 +49,7 @@ final class TelegramNotificationHandler implements LookupServiceHandler {
       _db.setKey(searchInfo.key, messageId);
       l.i('Saved message ID $messageId for ${searchInfo.nummer}');
     } on ForbiddenTelegramException catch (error) {
-      _db.removeUserById(error.chatId);
+      await _db.removeUserById(error.chatId);
       l.e('Bot is blocked: $error');
     } on Object catch (error, stackTrace) {
       l.e('Failed to send message: $error', stackTrace);
@@ -73,7 +73,7 @@ final class TelegramNotificationHandler implements LookupServiceHandler {
         entity: certificate,
       );
     } on ForbiddenTelegramException catch (error) {
-      _db.removeUserById(error.chatId);
+      await _db.removeUserById(error.chatId);
       l.e('Bot is blocked: $error');
     } on Object catch (error, stackTrace) {
       l.e('Failed to send message: $error', stackTrace);

@@ -1,5 +1,6 @@
 {
   "@@locale": "en",
+  "@@last_modified": "2025-06-13T10:36:59.524911",
   "helpListHeader": "Available commands:",
   "@helpListHeader": {
     "description": "Header for the list of available commands in the help message.",
@@ -50,6 +51,12 @@
     "type": "text",
     "placeholders": {}
   },
+  "startWelcomeMessage": "👋 Welcome to the telc certificate checker bot!\n\nThis bot helps you check your telc exam results quickly and easily.\n\nTo add your exam data, use the /add command.\nYou can also view your saved data with /show, delete it with /delete, or revoke consent and delete all your data with /delete_me.\n\n",
+  "@startWelcomeMessage": {
+    "description": "Welcome message shown when the bot starts.",
+    "type": "text",
+    "placeholders": {}
+  },
   "startBotWith": "👋 Welcome to the telc certificate checker bot!\n\nFor my operation, I will collect and process some data:\n*   Your Telegram data: ID, language code – for identification and communication.\n*   Data for certificate lookup: exam attendee number, birth date, and exam date. You will enter this data yourself.\n\n📄 Found certificate information (e.g., \"B2 Beruf\") will be stored in the system. The retention period for such data is no more than 12 months.\n\n⚠️ Important!\nYou may enter data to search for another person's certificate. By providing such data, you confirm that you have all necessary permissions (e.g., consent from this person) for its processing via the bot for the specified purposes.\n\nBy clicking the \"Agree\" button, you confirm your acceptance of our Privacy Policy\n",
   "@startBotWith": {
     "description": "Greeting message when the bot starts.",
@@ -74,7 +81,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "consentGivenMessage": "Thank you for your consent! You can now use all bot features.",
+  "consentGivenMessage": "Thank you for your consent! You can now use all bot features.\n To add your exam data, use the /add command.",
   "@consentGivenMessage": {
     "description": "Message shown when user agrees to privacy policy.",
     "type": "text",

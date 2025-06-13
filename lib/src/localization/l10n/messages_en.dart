@@ -47,7 +47,7 @@ class MessageLookup extends MessageLookupByLibrary {
     'checkNowCommandDescription': MessageLookupByLibrary.simpleMessage('Check for results now'),
     'checkNowStart': MessageLookupByLibrary.simpleMessage('Starting results check...'),
     'consentDeclinedMessage': MessageLookupByLibrary.simpleMessage('You have declined the terms. To use the bot, you need to agree to the Privacy Policy. You can restart the bot with /start to see the terms again.'),
-    'consentGivenMessage': MessageLookupByLibrary.simpleMessage('Thank you for your consent! You can now use all bot features.'),
+    'consentGivenMessage': MessageLookupByLibrary.simpleMessage('Thank you for your consent! You can now use all bot features.\n To add your exam data, use the /add command.'),
     'declineButtonText': MessageLookupByLibrary.simpleMessage('❌ Decline'),
     'deleteAllSuccessCallback': MessageLookupByLibrary.simpleMessage('All entries successfully deleted.'),
     'deleteButtonDeleteAll': MessageLookupByLibrary.simpleMessage('Delete All'),
@@ -77,6 +77,7 @@ class MessageLookup extends MessageLookupByLibrary {
     'showListHeader': MessageLookupByLibrary.simpleMessage('List of added entries:\n'),
     'showNoData': MessageLookupByLibrary.simpleMessage('No data added yet. Use /add to add new entries.'),
     'startBotWith': MessageLookupByLibrary.simpleMessage('👋 Welcome to the telc certificate checker bot!\n\nFor my operation, I will collect and process some data:\n*   Your Telegram data: ID, language code – for identification and communication.\n*   Data for certificate lookup: exam attendee number, birth date, and exam date. You will enter this data yourself.\n\n📄 Found certificate information (e.g., \"B2 Beruf\") will be stored in the system. The retention period for such data is no more than 12 months.\n\n⚠️ Important!\nYou may enter data to search for another person\'s certificate. By providing such data, you confirm that you have all necessary permissions (e.g., consent from this person) for its processing via the bot for the specified purposes.\n\nBy clicking the \"Agree\" button, you confirm your acceptance of our Privacy Policy\n'),
-    'startCommandDescription': MessageLookupByLibrary.simpleMessage('Start the bot and accept the privacy policy')
+    'startCommandDescription': MessageLookupByLibrary.simpleMessage('Start the bot and accept the privacy policy'),
+    'startWelcomeMessage': MessageLookupByLibrary.simpleMessage('👋 Welcome to the telc certificate checker bot!\n\nThis bot helps you check your telc exam results quickly and easily.\n\nTo add your exam data, use the /add command.\nYou can also view your saved data with /show, delete it with /delete, or revoke consent and delete all your data with /delete_me.\n\n')
   };
 }

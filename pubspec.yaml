@@ -34,7 +34,7 @@ dev_dependencies:
   lints: ^5.1.1
 
   # Testing
-  test: any
+  test: 1.26.3
   mockito: ^5.4.4
 
   # Code generation

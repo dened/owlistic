@@ -23,7 +23,7 @@ dependencies:
   http: ^1.2.2
 
   # Logger
-  l: ^5.0.0
+  l: ^5.0.1
 
   # Database (SQLite)
   drift: ^2.25.1
